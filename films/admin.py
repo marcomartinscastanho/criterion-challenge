@@ -10,7 +10,7 @@ from films.models import Film
 @admin.action(description="Generate SQL queries")
 def generate_sql_inserts(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet[Film]) -> None:
     queries = []
-    for film in queryset:
+    for film in queryset.order_by("cc_id"):
         sql_query = get_object_sql_insert(film)
         queries.append(sql_query)
 
