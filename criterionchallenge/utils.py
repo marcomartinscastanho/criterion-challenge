@@ -11,4 +11,6 @@ def get_object_sql_insert(obj: Model) -> str:
     escaped_values = [
         f"'{value}'" if isinstance(value, str) else "NULL" if value is None else str(value) for value in values
     ]
-    return f"INSERT INTO {table} ({', '.join(columns)}) VALUES ({', '.join(escaped_values)});"
+    sql_query = f"INSERT INTO {table} ({', '.join(columns)}) VALUES ({', '.join(escaped_values)});"
+    sql_query = sql_query.replace("{}", "{{}}")
+    return sql_query

@@ -12,8 +12,12 @@ class PrettyJSONEncoder(json.JSONEncoder):
         super().__init__(*args, indent=2, sort_keys=True, **kwargs)
 
 
+class CustomJSONField(forms.JSONField):
+    empty_values = [None, "", [], ()]
+
+
 class CategoryForm(forms.ModelForm):
-    custom_criteria = forms.JSONField(encoder=PrettyJSONEncoder)
+    custom_criteria = CustomJSONField(encoder=PrettyJSONEncoder)
 
     class Meta:
         model = Category

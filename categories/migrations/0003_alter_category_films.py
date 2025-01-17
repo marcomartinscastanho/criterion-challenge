@@ -4,16 +4,15 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('categories', '0002_category_custom_criteria'),
-        ('films', '0001_initial'),
+        ("categories", "0002_category_custom_criteria"),
+        ("films", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='category',
-            name='films',
-            field=models.ManyToManyField(blank=True, related_name='categories', to='films.film'),
+            model_name="category",
+            name="films",
+            field=models.ManyToManyField(blank=True, related_name="categories", to="films.film"),
         ),
     ]

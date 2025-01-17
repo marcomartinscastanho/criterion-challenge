@@ -42,5 +42,5 @@ class Category(models.Model):
 
     def save(self, *args, **kwargs):
         """Override save to ensure the custom validation is called."""
-        self.clean()  # Ensure clean() is called before saving
+        self.clean()
         super().save(*args, **kwargs)

@@ -4,15 +4,12 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('categories', '0001_initial'),
+        ("categories", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='category',
-            name='custom_criteria',
-            field=models.JSONField(blank=True, null=True),
+            model_name="category", name="custom_criteria", field=models.JSONField(blank=True, null=True)
         ),
     ]
