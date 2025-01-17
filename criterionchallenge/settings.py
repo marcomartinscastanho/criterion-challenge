@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     #
     "categories.apps.CategoryConfig",
+    "directors.apps.DirectorsConfig",
     "films.apps.FilmsConfig",
+    "picks.apps.PicksConfig",
 ]
 
 MIDDLEWARE = [
