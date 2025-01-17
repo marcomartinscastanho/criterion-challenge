@@ -8,6 +8,7 @@ class PickForm(forms.ModelForm):
     class Meta:
         model = Pick
         fields = "__all__"
+        exclude = ["year"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
