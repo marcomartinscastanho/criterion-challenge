@@ -1,3 +1,5 @@
+import json
+
 from django import forms
 from django.db.models import Max
 
@@ -5,7 +7,14 @@ from categories.models import Category
 from criterionchallenge.constants import CURRENT_YEAR
 
 
+class PrettyJSONEncoder(json.JSONEncoder):
+    def __init__(self, *args, indent, sort_keys, **kwargs):
+        super().__init__(*args, indent=2, sort_keys=True, **kwargs)
+
+
 class CategoryForm(forms.ModelForm):
+    custom_criteria = forms.JSONField(encoder=PrettyJSONEncoder)
+
     class Meta:
         model = Category
         fields = "__all__"

@@ -1,5 +1,5 @@
 INSERT INTO categories_category (number, title, year) VALUES (1, "Watch a film from the CC40 Boxset", 2025);
-INSERT INTO categories_category (number, title, year) VALUES (2, "Watch a film from the year you were born", 2025);
+INSERT INTO categories_category (number, title, year, custom_criteria) VALUES (2, "Watch a film from the year you were born", 2025, '{"year": {"user": "date_of_birth"}}');
 INSERT INTO categories_category (number, title, year) VALUES (3, "Directed by Robert Altman", 2025);
 INSERT INTO categories_category (number, title, year) VALUES (4, "Watch a film that would be your first choice in the Criterion Closet", 2025);
 INSERT INTO categories_category (number, title, year) VALUES (5, "Great Soundtracks", 2025);
