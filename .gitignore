@@ -1,0 +1,94 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg
+*.egg-info/
+dist/
+build/
+*.manifest
+*.spec
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.sqlite3
+db.sqlite3
+*.pyo
+
+# If you're using a custom database file
+*.db
+
+# Media files
+/media/
+
+# Static files
+/static/
+
+# Local development settings
+settings_local.py
+
+# Secrets
+*.pem
+*.key
+*.crt
+*.enc
+
+# pytest cache
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+
+# coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# Jupyter Notebook files
+.ipynb_checkpoints
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Test output
+test-results/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Temporary files and folders
+*.bak
+*.swp
+*.swo
+*.tmp
+
+# pipenv
+Pipfile
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# virtualenv wrapper
+.virtualenv/
