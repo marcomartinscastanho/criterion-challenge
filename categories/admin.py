@@ -7,15 +7,15 @@ from criterionchallenge.constants import CURRENT_YEAR
 
 class CategoryAdmin(admin.ModelAdmin):
     form = CategoryForm
-    list_display = ["number", "title", "get_films"]
+    list_display = ["number", "title", "num_films"]
     list_display_links = ["title"]
     search_fields = ["title"]
     filter_horizontal = ("films",)  # Allows to select multiple films
 
-    def get_films(self, obj):
-        return ", ".join([film.title for film in obj.films.all()])
+    def num_films(self, obj: Category):
+        return obj.num_films
 
-    get_films.short_description = "Films"
+    num_films.short_description = "# Films"
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)

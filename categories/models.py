@@ -19,3 +19,7 @@ class Category(models.Model):
 
     def __str__(self):
         return f"{self.number}: {self.title}"
+
+    @property
+    def num_films(self):
+        return self.films.count()
