@@ -127,3 +127,15 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+JAZZMIN_SETTINGS = {
+    "hide_models": ["auth.Group"],
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "categories.Category": "fa-solid fa-list",
+        "directors.Director": "fa-solid fa-clapperboard",
+        "films.Film": "fa-solid fa-film",
+        "picks.Pick": "fa-solid fa-check",
+    },
+}
