@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "directors.apps.DirectorsConfig",
     "films.apps.FilmsConfig",
     "picks.apps.PicksConfig",
+    "users.apps.UsersConfig",
 ]
 
 MIDDLEWARE = [
@@ -106,6 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = "users.User"
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -130,6 +132,11 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 JAZZMIN_SETTINGS = {
+    "site_title": "Criterion Challenge Admin",
+    "site_header": "Criterion Challenge",
+    "site_brand": "Criterion Challenge",
+    "welcome_sign": "Criterion Challenge Admin",
+    "copyright": "Marco Martins Castanho",
     "hide_models": ["auth.Group"],
     "icons": {
         "auth": "fas fa-users-cog",
@@ -138,6 +145,7 @@ JAZZMIN_SETTINGS = {
         "directors.Director": "fa-solid fa-clapperboard",
         "films.Film": "fa-solid fa-film",
         "picks.Pick": "fa-solid fa-check",
+        "users.User": "fa-solid fa-user",
     },
 }
 

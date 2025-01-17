@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -6,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from categories.models import Category
 from films.models import Film
+from users.models import User
 
 
 class Pick(models.Model):
