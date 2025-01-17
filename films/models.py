@@ -8,6 +8,7 @@ from directors.models import Director
 
 class Film(models.Model):
     title = models.CharField(max_length=200)
+    spine = models.PositiveIntegerField(unique=True, null=True, blank=True)
     year = models.PositiveIntegerField(validators=[MinValueValidator(1870)])
     letterboxd = models.URLField(max_length=200)
     directors = models.ManyToManyField(Director, related_name="films")

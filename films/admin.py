@@ -5,7 +5,8 @@ from films.models import Film
 
 
 class FilmAdmin(admin.ModelAdmin):
-    list_display = ["title", "year", "get_directors"]
+    list_display = ["spine", "title", "year", "get_directors"]
+    list_display_links = ["title"]
     search_fields = ["title"]
     filter_horizontal = ("directors",)  # This adds a dual list widget to select multiple directors
 
