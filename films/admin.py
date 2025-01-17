@@ -5,10 +5,11 @@ from films.models import Film
 
 
 class FilmAdmin(admin.ModelAdmin):
-    list_display = ["spine", "title", "year", "get_directors"]
+    list_display = ["spine", "title", "get_directors", "country", "year"]
     list_display_links = ["title"]
     search_fields = ["title"]
-    filter_horizontal = ("directors",)  # This adds a dual list widget to select multiple directors
+    filter_horizontal = ["directors"]
+    exclude = ["cc_id"]
 
     def get_directors(self, obj: Film):
         return ", ".join([director.name for director in obj.directors.all()])

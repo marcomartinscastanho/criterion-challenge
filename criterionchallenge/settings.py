@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -139,3 +140,5 @@ JAZZMIN_SETTINGS = {
         "picks.Pick": "fa-solid fa-check",
     },
 }
+
+CRITERION_CF_CLEARANCE = os.getenv("CRITERION_CF_CLEARANCE")

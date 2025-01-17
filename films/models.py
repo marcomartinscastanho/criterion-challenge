@@ -63,10 +63,11 @@ class Film(models.Model):
         ("WG", "West Germany"),
         ("YU", "Yugoslavia"),
     ]
+    cc_id = models.PositiveIntegerField(unique=True)
     title = models.CharField(max_length=200)
-    spine = models.PositiveIntegerField(unique=True, null=True, blank=True)
-    year = models.PositiveIntegerField(validators=[MinValueValidator(1870)])
-    country = models.CharField(max_length=2, choices=COUNTRY_CHOICES)
+    spine = models.PositiveIntegerField(null=True, blank=True)
+    year = models.PositiveIntegerField(null=True, blank=True, validators=[MinValueValidator(1870)])
+    country = models.CharField(max_length=2, null=True, choices=COUNTRY_CHOICES)
     directors = models.ManyToManyField(Director, related_name="films")
     letterboxd = models.URLField(max_length=200)
 
