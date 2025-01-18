@@ -19,7 +19,7 @@ def generate_sql_inserts(modeladmin: admin.ModelAdmin, request: HttpRequest, que
 
 
 class FilmAdmin(admin.ModelAdmin):
-    list_display = ["spine", "title", "get_directors", "country", "year"]
+    list_display = ["spine", "title", "get_directors", "country", "year", "letterboxd"]
     list_display_links = ["title"]
     search_fields = ["title"]
     filter_horizontal = ["directors"]
