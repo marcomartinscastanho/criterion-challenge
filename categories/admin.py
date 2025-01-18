@@ -51,6 +51,26 @@ def generate_sql_inserts(modeladmin: admin.ModelAdmin, request: HttpRequest, que
     modeladmin.message_user(request, format_html(f"<pre>{joined_queries}</pre>"))
 
 
+class FilmsInline(admin.TabularInline):
+    model = Film.categories.through
+    extra = 0
+    can_delete = False
+
+    def get_queryset(self, request):
+        """
+        Override the default queryset to include related Film fields.
+        """
+        queryset = super().get_queryset(request)
+        # Prefetch the related Film objects to avoid additional queries
+        return queryset.prefetch_related("film")
+
+    def has_add_permission(self, request, obj=...):
+        return False
+
+    def has_change_permission(self, request, obj=...):
+        return False
+
+
 class CategoryAdmin(admin.ModelAdmin):
     form = CategoryForm
     list_display = ["number", "title", "num_films"]
@@ -58,6 +78,7 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ["title"]
     filter_horizontal = ("films",)  # Allows to select multiple films
     actions = [generate_sql_inserts]
+    inlines = [FilmsInline]
 
     def num_films(self, obj: Category):
         return obj.num_films

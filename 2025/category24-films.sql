@@ -1,0 +1,18 @@
+INSERT INTO categories_category (id, number, title, year, custom_criteria) VALUES (24, 24, 'Janus Contemporaries', 2025, "{}");
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 33481 WHERE c.year = 2025 AND c.number = 24;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 33485 WHERE c.year = 2025 AND c.number = 24;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 33490 WHERE c.year = 2025 AND c.number = 24;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 33531 WHERE c.year = 2025 AND c.number = 24;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 33541 WHERE c.year = 2025 AND c.number = 24;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 33649 WHERE c.year = 2025 AND c.number = 24;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 33650 WHERE c.year = 2025 AND c.number = 24;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 33797 WHERE c.year = 2025 AND c.number = 24;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 33900 WHERE c.year = 2025 AND c.number = 24;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 33901 WHERE c.year = 2025 AND c.number = 24;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 33918 WHERE c.year = 2025 AND c.number = 24;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 33942 WHERE c.year = 2025 AND c.number = 24;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 33999 WHERE c.year = 2025 AND c.number = 24;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 34053 WHERE c.year = 2025 AND c.number = 24;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 34088 WHERE c.year = 2025 AND c.number = 24;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 34102 WHERE c.year = 2025 AND c.number = 24;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 34331 WHERE c.year = 2025 AND c.number = 24;

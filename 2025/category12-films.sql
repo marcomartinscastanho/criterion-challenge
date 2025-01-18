@@ -1,0 +1,11 @@
+INSERT INTO categories_category (id, number, title, year, custom_criteria) VALUES (12, 12, 'Celine Song’s Top 10', 2025, "{}");
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 212 WHERE c.year = 2025 AND c.number = 12;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 543 WHERE c.year = 2025 AND c.number = 12;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 789 WHERE c.year = 2025 AND c.number = 12;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 1093 WHERE c.year = 2025 AND c.number = 12;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 1515 WHERE c.year = 2025 AND c.number = 12;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 27874 WHERE c.year = 2025 AND c.number = 12;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 28059 WHERE c.year = 2025 AND c.number = 12;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 28404 WHERE c.year = 2025 AND c.number = 12;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 28834 WHERE c.year = 2025 AND c.number = 12;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 29008 WHERE c.year = 2025 AND c.number = 12;
