@@ -1,0 +1,10 @@
+INSERT INTO categories_category (id, number, title, year, custom_criteria) VALUES (32, 32, 'Ayo Edebiri’s Closet Picks', 2025, "{}");
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 333 WHERE c.year = 2025 AND c.number = 32;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 543 WHERE c.year = 2025 AND c.number = 32;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 594 WHERE c.year = 2025 AND c.number = 32;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 603 WHERE c.year = 2025 AND c.number = 32;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 28024 WHERE c.year = 2025 AND c.number = 32;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 28879 WHERE c.year = 2025 AND c.number = 32;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 28880 WHERE c.year = 2025 AND c.number = 32;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 29567 WHERE c.year = 2025 AND c.number = 32;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 32158 WHERE c.year = 2025 AND c.number = 32;

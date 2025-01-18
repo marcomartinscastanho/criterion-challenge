@@ -1,0 +1,12 @@
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 28849 WHERE c.year = 2025 AND c.number = 42;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 29067 WHERE c.year = 2025 AND c.number = 42;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 29069 WHERE c.year = 2025 AND c.number = 42;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 33101 WHERE c.year = 2025 AND c.number = 42;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 28412 WHERE c.year = 2025 AND c.number = 42;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 29070 WHERE c.year = 2025 AND c.number = 42;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 33087 WHERE c.year = 2025 AND c.number = 42;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 29071 WHERE c.year = 2025 AND c.number = 42;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 28413 WHERE c.year = 2025 AND c.number = 42;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 32409 WHERE c.year = 2025 AND c.number = 42;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 32158 WHERE c.year = 2025 AND c.number = 42;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 32189 WHERE c.year = 2025 AND c.number = 42;

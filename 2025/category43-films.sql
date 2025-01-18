@@ -1,0 +1,11 @@
+INSERT INTO categories_category (id, number, title, year, custom_criteria) VALUES (43, 43, 'John Carpenter’s Top 10', 2025, "{}");
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 236 WHERE c.year = 2025 AND c.number = 43;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 541 WHERE c.year = 2025 AND c.number = 43;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 680 WHERE c.year = 2025 AND c.number = 43;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 681 WHERE c.year = 2025 AND c.number = 43;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 724 WHERE c.year = 2025 AND c.number = 43;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 829 WHERE c.year = 2025 AND c.number = 43;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 27620 WHERE c.year = 2025 AND c.number = 43;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 28694 WHERE c.year = 2025 AND c.number = 43;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 28831 WHERE c.year = 2025 AND c.number = 43;
+INSERT INTO categories_category_films (category_id, film_id) SELECT c.id, f.cc_id FROM categories_category c JOIN films_film f ON f.cc_id = 30460 WHERE c.year = 2025 AND c.number = 43;
