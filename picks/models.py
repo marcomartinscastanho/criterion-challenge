@@ -31,6 +31,11 @@ class Pick(models.Model):
                     return
                 else:
                     raise ValidationError(_("The year of the pick must match the category criteria."))
+            if key == "spine" and value == "not_null":
+                if self.film.spine is not None:
+                    return
+                else:
+                    raise ValidationError(_("The pick must have a spine."))
 
     def clean(self):
         if self.year != self.category.year:
