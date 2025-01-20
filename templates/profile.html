@@ -36,4 +36,58 @@
     <button type="submit" class="btn btn-primary">Save Changes</button>
   </div>
 </form>
+
+<hr class="mt-5" />
+{% load film_extras %} {% load common_extras %}
+
+<h2>Film stats</h2>
+<p>Your stats allow us to make a better selection for your Criterion Challenge.</p>
+<div class="row">
+  <div class="col">
+    <h3>Films</h3>
+    {% if user.watched %}
+    <p>{{ user.watched.num_films }} of {% films_count %}</p>
+    <p>Last updated: {{user.watched.updated_at}}</p>
+    {% if user.watched.updated_at|more_than_a_month_ago %}
+    <div class="alert alert-warning">You haven't updated your Watched list in a while.</div>
+    {% endif %} {% else %}
+    <div class="alert alert-warning">
+      We don't have your Watched films yet.<br />
+      Use the form below to upload them.
+    </div>
+    {% endif %}
+  </div>
+  <div class="col">
+    <h3>Watchlist</h3>
+    {% if user.watchlist %}
+    <p>{{ user.watchlist.num_films }} of {% films_count %}</p>
+    <p>Last updated: {{user.watchlist.updated_at}}</p>
+    {% if user.watchlist.updated_at|more_than_a_month_ago %}
+    <div class="alert alert-warning">You haven't updated your Watchlist in a while.</div>
+    {% endif %} {% else %}
+    <div class="alert alert-warning">
+      We don't have your Watchlist stats yet.<br />
+      Use the form below to upload them.
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- CSV Upload Section -->
+<h4 class="mt-2">Update lists</h4>
+<small>
+  Unfortunately, Letterboxd does not provide an API to allow us to get your Films/Watchlist in a simple effortless way.
+  Therefore we need your help to get your film data. Go to your Letterboxd settings, then the "Data" tab and "Export
+  your data". This will export a .zip file containing the "watched.csv" and "watchlist.csv" files you need to import
+  here.
+</small>
+<form method="post" enctype="multipart/form-data" class="mt-2">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label for="csv_file" class="form-label">Select a CSV file to upload:</label>
+    <input type="file" name="csv_file" id="csv_file" class="form-control" accept=".csv" required />
+  </div>
+  <button type="submit" class="btn btn-primary">Upload</button>
+</form>
+
 {% endblock %}

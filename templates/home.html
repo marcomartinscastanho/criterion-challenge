@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {% block content %} {% if user.is_authenticated %}
 <h2>Hello, {{ user.get_full_name|default:user.username }}!</h2>
-<p><a href="{% url 'upload_csv' %}" class="btn btn-primary">Upload a CSV File</a></p>
+<p>placeholder</p>
 {% else %}
 <p>Welcome! Please <a href="{% url 'login' %}">log in</a> to access more features.</p>
 {% endif %} {% endblock %}

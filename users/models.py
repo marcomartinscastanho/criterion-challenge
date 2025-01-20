@@ -16,6 +16,10 @@ class UserWatched(models.Model):
     class Meta:
         verbose_name = "Watched Film"
 
+    @property
+    def num_films(self):
+        return self.films.count()
+
 
 class UserWatchlist(models.Model):
     user = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name="watchlist")
@@ -24,3 +28,7 @@ class UserWatchlist(models.Model):
 
     class Meta:
         verbose_name = "Watchlisted Film"
+
+    @property
+    def num_films(self):
+        return self.films.count()
