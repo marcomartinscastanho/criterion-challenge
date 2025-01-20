@@ -3,6 +3,7 @@ from math import floor
 from django.core.validators import MinValueValidator
 from django.db import models
 
+from criterionchallenge.constants import CURRENT_YEAR
 from directors.models import Director
 
 
@@ -80,3 +81,11 @@ class Film(models.Model):
     @property
     def decade(self):
         return 10 * floor(self.year / 10)
+
+    @property
+    def current_categories(self):
+        return self.categories.filter(year=CURRENT_YEAR)
+
+    @property
+    def current_categories_count(self):
+        return self.categories.filter(year=CURRENT_YEAR).count()

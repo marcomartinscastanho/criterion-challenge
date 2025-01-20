@@ -19,7 +19,7 @@ def generate_sql_inserts(modeladmin: admin.ModelAdmin, request: HttpRequest, que
 
 
 class FilmAdmin(admin.ModelAdmin):
-    list_display = ["spine", "title", "get_directors", "country", "year", "letterboxd"]
+    list_display = ["spine", "title", "get_directors", "country", "year", "letterboxd", "get_categories"]
     list_display_links = ["title"]
     search_fields = ["title"]
     filter_horizontal = ["directors"]
@@ -29,6 +29,11 @@ class FilmAdmin(admin.ModelAdmin):
         return ", ".join([director.name for director in obj.directors.all()])
 
     get_directors.short_description = "Director"
+
+    def get_categories(self, obj: Film):
+        return f"{obj.current_categories_count}: " + ", ".join([category.title for category in obj.current_categories])
+
+    get_categories.short_description = "Categories"
 
 
 admin.site.register(Film, FilmAdmin)
