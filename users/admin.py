@@ -14,15 +14,15 @@ class UserAdmin(DefaultUserAdmin):
     )
 
 
-class UserWatchedAdmin(admin.ModelAdmin):
+class UserStatsAdmin(admin.ModelAdmin):
     list_display = ["user", "num_films", "updated_at"]
 
-    def num_films(self, obj: UserWatched):
+    def num_films(self, obj):
         return obj.num_films
 
     num_films.short_description = "# Films"
 
 
 admin.site.register(User, UserAdmin)
-admin.site.register(UserWatched, UserWatchedAdmin)
-admin.site.register(UserWatchlist)
+admin.site.register(UserWatched, UserStatsAdmin)
+admin.site.register(UserWatchlist, UserStatsAdmin)
