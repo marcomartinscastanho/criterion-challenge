@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from users.models import User
+from users.models import User, UserWatched, UserWatchlist
 
 
 class UserAdmin(DefaultUserAdmin):
@@ -15,3 +15,5 @@ class UserAdmin(DefaultUserAdmin):
 
 
 admin.site.register(User, UserAdmin)
+admin.site.register(UserWatched)
+admin.site.register(UserWatchlist)

@@ -132,6 +132,7 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# https://django-jazzmin.readthedocs.io/configuration/
 JAZZMIN_SETTINGS = {
     "site_title": "Criterion Challenge Admin",
     "site_header": "Criterion Challenge",
@@ -147,6 +148,8 @@ JAZZMIN_SETTINGS = {
         "films.Film": "fa-solid fa-film",
         "picks.Pick": "fa-solid fa-check",
         "users.User": "fa-solid fa-user",
+        "users.UserWatchlist": "fa-regular fa-square",
+        "users.UserWatched": "fa-solid fa-square-check",
     },
 }
 
