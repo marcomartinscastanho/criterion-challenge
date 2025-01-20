@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "categories.apps.CategoryConfig",
     "directors.apps.DirectorsConfig",
     "films.apps.FilmsConfig",
+    "home.apps.HomeConfig",
     "picks.apps.PicksConfig",
     "users.apps.UsersConfig",
 ]
@@ -62,7 +63,7 @@ ROOT_URLCONF = "criterionchallenge.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -150,3 +151,6 @@ JAZZMIN_SETTINGS = {
 }
 
 CRITERION_CF_CLEARANCE = os.getenv("CRITERION_CF_CLEARANCE")
+
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
