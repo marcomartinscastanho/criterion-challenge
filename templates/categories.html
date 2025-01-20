@@ -1,0 +1,25 @@
+{% extends 'base.html' %} {% block content %}
+<h1>Categories</h1>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Number</th>
+      <th>Title</th>
+      <th># Films</th>
+      <th>Watched</th>
+      <th>in Watchlist</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for category in categories %}
+    <tr>
+      <td>{{ category.number }}</td>
+      <td>{{ category.title }}</td>
+      <td>{{ category.films_count }}</td>
+      <td>{{ category.watched_count|default:0 }}</td>
+      <td>{{ category.watchlist_count|default:0 }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
