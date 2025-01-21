@@ -87,7 +87,7 @@ class FilmAdmin(admin.ModelAdmin):
     def letterboxd_link(self, obj: Film):
         return format_html('<a href="{url}" target="_blank" rel="noopener noreferrer">{url}</a>', url=obj.letterboxd)
 
-    @admin.display(description="Director")
+    @admin.display(description="Director", ordering="directors__name")
     def get_directors(self, obj: Film):
         return ", ".join([director.name for director in obj.directors.all()])
 
