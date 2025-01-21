@@ -76,14 +76,13 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ["number", "title", "num_films"]
     list_display_links = ["title"]
     search_fields = ["title"]
-    filter_horizontal = ("films",)  # Allows to select multiple films
+    filter_horizontal = ["films"]
     actions = [generate_sql_inserts]
     inlines = [FilmsInline]
 
+    @admin.display(description="# Films")
     def num_films(self, obj: Category):
         return obj.num_films
-
-    num_films.short_description = "# Films"
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)

@@ -77,21 +77,23 @@ def generate_sql_inserts(modeladmin: admin.ModelAdmin, request: HttpRequest, que
 
 
 class FilmAdmin(admin.ModelAdmin):
-    list_display = ["cc_id", "spine", "title", "get_directors", "country", "year", "letterboxd", "get_categories"]
+    list_display = ["cc_id", "spine", "title", "get_directors", "country", "year", "letterboxd_link", "get_categories"]
     list_display_links = ["title"]
     search_fields = ["title", "letterboxd"]
     filter_horizontal = ["directors"]
     actions = [generate_sql_inserts]
 
+    @admin.display(description="Letterboxd", ordering="letterboxd")
+    def letterboxd_link(self, obj: Film):
+        return format_html('<a href="{url}" target="_blank" rel="noopener noreferrer">{url}</a>', url=obj.letterboxd)
+
+    @admin.display(description="Director")
     def get_directors(self, obj: Film):
         return ", ".join([director.name for director in obj.directors.all()])
 
-    get_directors.short_description = "Director"
-
+    @admin.display(description="Categories")
     def get_categories(self, obj: Film):
         return f"{obj.current_categories_count}: " + ", ".join([category.title for category in obj.current_categories])
-
-    get_categories.short_description = "Categories"
 
 
 admin.site.register(Film, FilmAdmin)

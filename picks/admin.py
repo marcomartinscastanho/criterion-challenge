@@ -10,10 +10,9 @@ class PickAdmin(admin.ModelAdmin):
     list_display = ["category", "film", "film_year", "watched", "user"]
     list_filter = ["user"]
 
+    @admin.display(description="Year")
     def film_year(self, obj: Pick):
         return obj.film.year
-
-    film_year.short_description = "Year"
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)

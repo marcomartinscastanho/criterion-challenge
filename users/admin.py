@@ -17,10 +17,9 @@ class UserAdmin(DefaultUserAdmin):
 class UserStatsAdmin(admin.ModelAdmin):
     list_display = ["user", "num_films", "updated_at"]
 
+    @admin.display(description="# Films")
     def num_films(self, obj):
         return obj.num_films
-
-    num_films.short_description = "# Films"
 
 
 admin.site.register(User, UserAdmin)
