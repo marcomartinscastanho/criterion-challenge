@@ -1,0 +1,18 @@
+{% extends 'base.html' %} {% block content %}
+<h1>{{ category.number }} : {{ category.title }}</h1>
+<div class="d-flex flex-wrap mb-4">
+  {% for film in category.films %}
+  <a
+    class="btn btn-lg btn-primary me-2 mb-2 {% if film.watched %}opacity-50{% endif %} {% if film.watchlisted %}border border-3 border-warning{% endif %}"
+    href="{{film.url}}"
+    target="_blank"
+    rel="noopener noreferrer"
+    >{{ film.title }} <small>({{film.year}})</small></a
+  >
+  {% empty %}
+  <p>No films in this category.</p>
+  {% endfor %}
+</div>
+
+<a href="{% url 'categories' %}" class="btn btn-secondary">Back to Categories</a>
+{% endblock %}

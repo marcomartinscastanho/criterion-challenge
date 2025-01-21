@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import QuerySet
 from django.http import HttpRequest
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
 from categories.models import Category
 from criterionchallenge.constants import CURRENT_YEAR
@@ -59,6 +59,7 @@ def categories(request: HttpRequest):
         user_watchlist_films = films.filter(pk__in=user_watchlist_qs)
         category_list.append(
             {
+                "id": category.pk,
                 "number": category.number,
                 "title": category.title,
                 "films_count": len_or_warning(films),
@@ -67,3 +68,27 @@ def categories(request: HttpRequest):
             }
         )
     return render(request, "categories.html", {"categories": category_list})
+
+
+@login_required
+def category_detail(request, category_id):
+    user = request.user
+    category = get_object_or_404(Category, id=category_id)
+    user_watched_qs = UserWatched.objects.filter(user=user).values("films")
+    user_watchlist_qs = UserWatchlist.objects.filter(user=user).values("films")
+    films = get_category_films(category, user, user_watched_qs, user_watchlist_qs)
+    film_objects = [
+        {
+            "title": film.title,
+            "year": film.year,
+            "url": film.letterboxd,
+            "watched": user_watched_qs.filter(films=film).exists(),
+            "watchlisted": user_watchlist_qs.filter(films=film).exists(),
+        }
+        for film in films
+    ]
+    return render(
+        request,
+        "category.html",
+        {"category": {"number": category.number, "title": category.title, "films": film_objects}},
+    )

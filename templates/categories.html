@@ -12,7 +12,7 @@
   </thead>
   <tbody>
     {% for category in categories %}
-    <tr>
+    <tr onclick="window.location='{% url 'category_detail' category.id %}'" style="cursor: pointer">
       <td>{{ category.number }}</td>
       <td>{{ category.title }}</td>
       <td>{{ category.films_count }}</td>
