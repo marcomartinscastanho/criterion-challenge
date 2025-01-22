@@ -1,23 +1,37 @@
 {% if picks %}
   <h3>Your Picks</h3>
-  <ol class="d-flex flex-column gap-2 mb-4">
-    {% for pick in picks %}
-      <li class="form-floating">
-        <select class="form-select"
-                id="floatingSelect"
-                aria-label="{{ pick.category.title }}"
-                {% if pick.watched %}disabled{% endif %}>
-          {% for film in pick.category.films %}
-            <option value="{{ film.cc_id }}"
-                    {% if pick.film.cc_id == film.cc_id %}selected{% endif %}>
-              {{ film.title }} <small>({{ film.year }})</small>
-            </option>
-          {% endfor %}
-        </select>
-        <label for="floatingSelect">{{ pick.category.title }}</label>
-      </li>
-    {% endfor %}
-  </ol>
+  <table class="table table-borderless">
+    <tbody>
+      {% for pick in picks %}
+        <tr class="align-items-stretch">
+          <th scope="row" class="align-middle">
+            <span class="d-flex justify-content-center align-items-center h-100">{{ pick.number }}</span>
+          </th>
+          <td class="form-floating">
+            <select class="form-select"
+                    id="floatingSelect"
+                    aria-label="{{ pick.category.title }}"
+                    {% if pick.watched %}disabled{% endif %}>
+              {% for film in pick.category.films %}
+                <option value="{{ film.cc_id }}"
+                        {% if film.disabled %}disabled{% endif %}
+                        {% if pick.film.cc_id == film.cc_id %}selected{% endif %}>
+                  {{ film.title }} <small>({{ film.year }})</small>
+                </option>
+              {% endfor %}
+            </select>
+            <label for="floatingSelect">{{ pick.category.title }}</label>
+          </td>
+          <td class="align-middle">
+            <a href="{{ pick.film.letterboxd }}"
+               class="btn btn-lg btn-outline-primary h-100 d-flex align-items-center justify-content-center"
+               target="_blank"
+               rel="noopener noreferrer">{{ pick.film.letterboxd }}</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 {% else %}
   <p>No picks available.</p>
 {% endif %}
