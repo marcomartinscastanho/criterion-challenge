@@ -9,6 +9,7 @@ from categories.utils import get_category_films
 from criterionchallenge.constants import CURRENT_YEAR
 from films.models import Film
 from picks.models import Pick
+from picks.utils import generate_picks
 from users.models import User, UserWatched, UserWatchlist
 
 
@@ -18,7 +19,7 @@ def picks(request: HttpRequest):
     user_watched_qs = UserWatched.objects.filter(user=user).values("films")
     user_watchlist_qs = UserWatchlist.objects.filter(user=user).values("films")
     if not user.challenge_complete:
-        pass  # TODO
+        generate_picks(user)
     picks = []
     picks_qs = Pick.objects.select_related("category").filter(user=user).filter(year=CURRENT_YEAR)
     for pick in picks_qs:
