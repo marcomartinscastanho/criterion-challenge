@@ -1,6 +1,13 @@
 {% if picks %}
   <h3>Your Picks</h3>
   <table class="table table-borderless">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Pick</th>
+        <th scope="col">Letterboxd</th>
+      </tr>
+    </thead>
     <tbody>
       {% for pick in picks %}
         <tr class="align-items-stretch">
@@ -27,7 +34,7 @@
             <a href="{{ pick.film.letterboxd }}"
                class="btn btn-lg btn-outline-primary h-100 d-flex align-items-center justify-content-center"
                target="_blank"
-               rel="noopener noreferrer">{{ pick.film.letterboxd }}</a>
+               rel="noopener noreferrer">Letterboxd</a>
           </td>
         </tr>
       {% endfor %}
