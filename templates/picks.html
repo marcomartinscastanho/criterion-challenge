@@ -18,7 +18,7 @@
           <td class="form-floating">
             <select class="form-select"
                     id="floatingSelect"
-                    data-pick-id="{{ pick.number }}"
+                    data-pick-id="{{ pick.id }}"
                     aria-label="{{ pick.category.title }}"
                     {% if pick.locked %}disabled{% endif %}>
               {% for film in pick.category.films %}
@@ -42,7 +42,7 @@
             <input type="checkbox"
                    class="form-check-input"
                    id="locked-checkbox"
-                   data-pick-id="{{ pick.number }}"
+                   data-pick-id="{{ pick.id }}"
                    {% if pick.locked %}checked{% endif %}>
           </td>
         </tr>
@@ -50,6 +50,9 @@
     </tbody>
   </table>
   <small>* in your watchlist</small>
+  <div class="my-2">
+    <a href="{% url 'complete_picks' %}" class="btn btn-primary">Regenerate Picks</a>
+  </div>
 {% else %}
   <a href="{% url 'complete_picks' %}" class="btn btn-primary">Generate Picks</a>
 {% endif %}

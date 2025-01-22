@@ -40,6 +40,7 @@ def picks(request: HttpRequest):
             )
         picks.append(
             {
+                "id": pick.pk,
                 "number": category.number,
                 "film": pick.film,
                 "locked": pick.locked,

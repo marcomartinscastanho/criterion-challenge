@@ -46,8 +46,8 @@ def generate_picks(user: User):
         categories_stats, key=lambda x: (x["watchlisted_films_count"], x["films_count"], x["number"])
     )
     existing_picks = Pick.objects.filter(user=user, year=CURRENT_YEAR)
-    picked_films = set(existing_picks.values("film"))
-    picked_categories = set(existing_picks.values("category"))
+    picked_films = set(existing_picks.values_list("film", flat=True))
+    picked_categories = set(existing_picks.values_list("category", flat=True))
     for category_stats in categories_stats:
         category = category_stats["category"]
         if category in picked_categories:
