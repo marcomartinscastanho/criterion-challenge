@@ -7,10 +7,12 @@
                 id="floatingSelect"
                 aria-label="{{ pick.category.title }}"
                 {% if pick.watched %}disabled{% endif %}>
-          <option selected>Open this select menu</option>
-          <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
+          {% for film in pick.category.films %}
+            <option value="{{ film.cc_id }}"
+                    {% if pick.film.cc_id == film.cc_id %}selected{% endif %}>
+              {{ film.title }} <small>({{ film.year }})</small>
+            </option>
+          {% endfor %}
         </select>
         <label for="floatingSelect">{{ pick.category.title }}</label>
       </li>
