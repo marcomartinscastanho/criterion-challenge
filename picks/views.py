@@ -2,7 +2,7 @@ import json
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
 from categories.utils import get_category_films
@@ -18,8 +18,6 @@ def picks(request: HttpRequest):
     user: User = request.user
     user_watched_qs = UserWatched.objects.filter(user=user).values("films")
     user_watchlist_qs = UserWatchlist.objects.filter(user=user).values("films")
-    if not user.challenge_complete:
-        generate_picks(user)
     picks = []
     picks_qs = Pick.objects.select_related("category").filter(user=user).filter(year=CURRENT_YEAR)
     for pick in picks_qs:
@@ -50,6 +48,14 @@ def picks(request: HttpRequest):
         )
 
     return render(request, "picks.html", {"picks": picks})
+
+
+@login_required
+def complete_picks(request: HttpRequest):
+    user: User = request.user
+    Pick.objects.filter(user=user, year=CURRENT_YEAR, locked=False).delete()
+    generate_picks(user)
+    return redirect("/")
 
 
 @login_required
