@@ -1,9 +1,13 @@
+import json
+
 from django.contrib.auth.decorators import login_required
-from django.http import HttpRequest
+from django.http import HttpRequest, JsonResponse
 from django.shortcuts import render
+from django.views.decorators.http import require_http_methods
 
 from categories.utils import get_category_films
 from criterionchallenge.constants import CURRENT_YEAR
+from films.models import Film
 from picks.models import Pick
 from users.models import User, UserWatched, UserWatchlist
 
@@ -45,3 +49,21 @@ def picks(request: HttpRequest):
         )
 
     return render(request, "picks.html", {"picks": picks})
+
+
+@login_required
+@require_http_methods(["PATCH"])
+def update_pick(request: HttpRequest, pick_id: int):
+    data = json.loads(request.body)
+    film_cc_id = data.get("film_cc_id")
+    locked = data.get("locked")
+    try:
+        pick = Pick.objects.get(id=pick_id, user=request.user)
+        if film_cc_id:
+            pick.film = Film.objects.get(cc_id=film_cc_id)
+        if locked is not None:
+            pick.locked = locked
+        pick.save()
+        return JsonResponse({"success": True})
+    except (Pick.DoesNotExist, Film.DoesNotExist):
+        return JsonResponse({"success": False, "error": "Pick or Film not found"}, status=404)

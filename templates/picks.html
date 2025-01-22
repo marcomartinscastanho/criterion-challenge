@@ -18,6 +18,7 @@
           <td class="form-floating">
             <select class="form-select"
                     id="floatingSelect"
+                    data-pick-id="{{ pick.number }}"
                     aria-label="{{ pick.category.title }}"
                     {% if pick.locked %}disabled{% endif %}>
               {% for film in pick.category.films %}
@@ -41,6 +42,7 @@
             <input type="checkbox"
                    class="form-check-input"
                    id="locked-checkbox"
+                   data-pick-id="{{ pick.number }}"
                    {% if pick.locked %}checked{% endif %}>
           </td>
         </tr>

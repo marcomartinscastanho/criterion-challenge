@@ -38,6 +38,52 @@
       .catch((error) => {
         document.getElementById("picks-container").innerHTML = "<p>Failed to load picks. Please try again later.</p>";
       });
+
+      const picksContainer = document.getElementById("picks-container");
+
+      // Attach event delegation for selects and checkboxes
+    picksContainer.addEventListener("change", function (event) {
+      if (event.target.classList.contains("form-select")) {
+        const pickId = event.target.dataset.pickId;
+        const filmId = event.target.value;
+        updatePick(pickId, { film_cc_id: filmId });
+      } else if (event.target.classList.contains("form-check-input")) {
+        const pickId = event.target.dataset.pickId;
+        const locked = event.target.checked;
+        updatePick(pickId, { locked: locked });
+      }
+    });
+
+    function updatePick(pickId, data) {
+      fetch(`/picks/update/${pickId}/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}",
+        },
+        body: JSON.stringify(data),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to update pick");
+          }
+          return response.json();
+        })
+        .then(() => {
+          // Reload picks after successful update
+          fetch("{% url 'picks' %}")
+            .then((response) => response.text())
+            .then((html) => {
+              picksContainer.innerHTML = html;
+            })
+            .catch((error) => {
+              console.error("Failed to reload picks:", error);
+            });
+        })
+        .catch((error) => {
+          console.error("Error updating pick:", error);
+        });
+    }
   });
       </script>
     {% endif %}
