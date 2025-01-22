@@ -7,6 +7,7 @@
     href="{{film.url}}"
     target="_blank"
     rel="noopener noreferrer"
+    title="{% if film.watched %}Watched{% elif film.watchlisted %}Watchlisted{% endif %}"
     >{{ film.title }} <small>({{film.year}})</small></a
   >
   {% empty %}
