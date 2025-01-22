@@ -7,7 +7,7 @@ from picks.models import Pick
 
 class PickAdmin(admin.ModelAdmin):
     form = PickForm
-    list_display = ["category", "film", "film_year", "watched", "user"]
+    list_display = ["category", "film", "film_year", "locked", "user"]
     list_filter = ["user"]
 
     @admin.display(description="Year")

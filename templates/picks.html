@@ -18,7 +18,7 @@
             <select class="form-select"
                     id="floatingSelect"
                     aria-label="{{ pick.category.title }}"
-                    {% if pick.watched %}disabled{% endif %}>
+                    {% if pick.locked %}disabled{% endif %}>
               {% for film in pick.category.films %}
                 <option value="{{ film.cc_id }}"
                         {% if film.disabled %}disabled{% endif %}

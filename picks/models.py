@@ -13,7 +13,7 @@ class Pick(models.Model):
     year = models.PositiveIntegerField(null=False, validators=[MinValueValidator(2020)])
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=False, blank=False, related_name="picks")
     film = models.ForeignKey(Film, on_delete=models.CASCADE, null=False, blank=False, related_name="picks")
-    watched = models.BooleanField(default=False, null=False)
+    locked = models.BooleanField(default=False, null=False)
 
     class Meta:
         constraints = [
@@ -49,6 +49,6 @@ class Pick(models.Model):
         return f"Pick by {self.user.username} - {self.category} - {self.film}"
 
     def save(self, *args, **kwargs):
-        if self.pk and Pick.objects.get(pk=self.pk).watched:
-            raise ValidationError(_("This pick is already watched and cannot be edited or deleted."))
+        # if self.pk and Pick.objects.get(pk=self.pk).watched:
+        #     raise ValidationError(_("This pick is already watched and cannot be edited or deleted."))
         super().save(*args, **kwargs)

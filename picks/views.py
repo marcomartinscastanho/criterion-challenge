@@ -39,7 +39,7 @@ def picks(request: HttpRequest):
             {
                 "number": category.number,
                 "film": pick.film,
-                "watched": pick.watched,
+                "locked": pick.locked,
                 "category": {"title": category.title, "films": films},
             }
         )
