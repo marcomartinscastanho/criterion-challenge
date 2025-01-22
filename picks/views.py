@@ -25,12 +25,14 @@ def picks(request: HttpRequest):
         for film in all_category_films:
             is_picked = other_picks.values("film").filter(film=film).exists()
             is_watched = user_watched_qs.filter(films=film).exists()
+            is_watchlisted = user_watchlist_qs.filter(films=film).exists()
             films.append(
                 {
                     "cc_id": film.cc_id,
                     "title": film.title,
                     "year": film.year,
                     "disabled": is_picked or is_watched,
+                    "watchlisted": is_watchlisted,
                 }
             )
         picks.append(

@@ -17,6 +17,7 @@
                         {% if film.disabled %}disabled{% endif %}
                         {% if pick.film.cc_id == film.cc_id %}selected{% endif %}>
                   {{ film.title }} <small>({{ film.year }})</small>
+                  {% if film.watchlisted %}*{% endif %}
                 </option>
               {% endfor %}
             </select>
@@ -32,6 +33,7 @@
       {% endfor %}
     </tbody>
   </table>
+  <small>* in your watchlist</small>
 {% else %}
   <p>No picks available.</p>
 {% endif %}
