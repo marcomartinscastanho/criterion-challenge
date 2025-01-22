@@ -6,6 +6,7 @@
         <th scope="col">#</th>
         <th scope="col">Pick</th>
         <th scope="col">Letterboxd</th>
+        <th scope="col">🔒</th>
       </tr>
     </thead>
     <tbody>
@@ -35,6 +36,12 @@
                class="btn btn-lg btn-outline-primary h-100 d-flex align-items-center justify-content-center"
                target="_blank"
                rel="noopener noreferrer">Letterboxd</a>
+          </td>
+          <td class="align-middle">
+            <input type="checkbox"
+                   class="form-check-input"
+                   id="locked-checkbox"
+                   {% if pick.locked %}checked{% endif %}>
           </td>
         </tr>
       {% endfor %}
