@@ -1,11 +1,19 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from criterionchallenge.constants import CURRENT_YEAR
 from films.models import Film
 
 
 class User(AbstractUser):
     date_of_birth = models.DateField(null=True, blank=True)
+
+    @property
+    def challenge_complete(self):
+        try:
+            return self.picks.filter(year=CURRENT_YEAR).count() == 52
+        except Exception:
+            return False
 
 
 class UserLists(models.Model):

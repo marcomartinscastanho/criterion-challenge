@@ -1,0 +1,21 @@
+{% if picks %}
+  <h3>Your Picks</h3>
+  <ol class="d-flex flex-column gap-2 mb-4">
+    {% for pick in picks %}
+      <li class="form-floating">
+        <select class="form-select"
+                id="floatingSelect"
+                aria-label="{{ pick.category.title }}"
+                {% if pick.watched %}disabled{% endif %}>
+          <option selected>Open this select menu</option>
+          <option value="1">One</option>
+          <option value="2">Two</option>
+          <option value="3">Three</option>
+        </select>
+        <label for="floatingSelect">{{ pick.category.title }}</label>
+      </li>
+    {% endfor %}
+  </ol>
+{% else %}
+  <p>No picks available.</p>
+{% endif %}
