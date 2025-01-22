@@ -48,21 +48,3 @@ def profile(request: HttpRequest):
                 return render(request, "profile.html", {"form": form, "error": f"An error occurred: {e}"})
     form = ProfileForm(instance=user)
     return render(request, "profile.html", {"form": form})
-
-
-# @login_required
-# def upload_csv(request: HttpRequest):
-#     if request.method == "POST" and request.FILES.get("csv_file"):
-#         csv_file = request.FILES["csv_file"]
-#         if not csv_file.name.endswith(".csv"):
-#             return render(request, "upload_csv.html", {"error": "The uploaded file must be a CSV file."})
-#         try:
-#             decoded_file = csv_file.read().decode("utf-8").splitlines()
-#             reader = csv.reader(decoded_file)
-#             for row in reader:
-#                 print(row)  # Replace with your processing logic
-#             return render(request, "upload_csv.html", {"success": "CSV file processed successfully!"})
-#         except Exception as e:
-#             return render(request, "upload_csv.html", {"error": f"An error occurred: {e}"})
-
-#     return render(request, "upload_csv.html")
