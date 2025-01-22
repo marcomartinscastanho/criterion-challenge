@@ -19,19 +19,19 @@ def get_category_films(
         for key, value in category.custom_criteria.items():
             if key == "year" and value == "user__date_of_birth":
                 if not user.date_of_birth:
-                    return Film.objects.none(), Film.objects.none(), Film.objects.none()
+                    return Film.objects.none()
                 films = films.filter(year=user.date_of_birth.year)
             if key == "spine" and value == "not_null":
                 films = films.filter(spine__isnull=False)
             if key == "in" and value == "user__watchlist":
                 if not user_watchlist_qs:
-                    return Film.objects.none(), Film.objects.none(), Film.objects.none()
+                    return Film.objects.none()
                 films = films.filter(pk__in=user_watchlist_qs.values_list("films", flat=True))
             if key == "director":
                 for key2, value2 in value.items():
                     if key2 == "not_in" and value2 == "user__films":
                         if not user_watched_qs:
-                            return Film.objects.none(), Film.objects.none(), Film.objects.none()
+                            return Film.objects.none()
                         watched_directors = Director.objects.filter(
                             films__in=user_watched_qs.values_list("films", flat=True)
                         ).distinct()
