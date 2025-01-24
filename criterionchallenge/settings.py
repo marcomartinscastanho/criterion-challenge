@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     #
     "categories.apps.CategoryConfig",
+    "common.apps.CommonConfig",
     "directors.apps.DirectorsConfig",
     "films.apps.FilmsConfig",
     "home.apps.HomeConfig",

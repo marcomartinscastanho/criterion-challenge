@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from criterionchallenge.constants import CURRENT_YEAR
+from common.constants import CURRENT_YEAR
 from films.models import Film
 
 

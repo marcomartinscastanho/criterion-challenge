@@ -5,7 +5,7 @@ from django.http import HttpRequest
 from django.utils.html import format_html
 
 from categories.models import Category
-from criterionchallenge.utils import get_object_sql_insert
+from common.utils import get_object_sql_insert
 from films.models import Film
 from picks.models import Pick
 from users.models import UserWatched, UserWatchlist

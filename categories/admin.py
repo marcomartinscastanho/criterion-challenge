@@ -5,8 +5,8 @@ from django.utils.html import format_html
 
 from categories.forms import CategoryForm
 from categories.models import Category
-from criterionchallenge.constants import CURRENT_YEAR
-from criterionchallenge.utils import get_object_sql_insert
+from common.constants import CURRENT_YEAR
+from common.utils import get_object_sql_insert
 from films.models import Film
 
 

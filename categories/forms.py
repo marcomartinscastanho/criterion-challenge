@@ -4,7 +4,7 @@ from django import forms
 from django.db.models import Max
 
 from categories.models import Category
-from criterionchallenge.constants import CURRENT_YEAR
+from common.constants import CURRENT_YEAR
 
 
 class PrettyJSONEncoder(json.JSONEncoder):

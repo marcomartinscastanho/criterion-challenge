@@ -3,7 +3,7 @@ from math import floor
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from criterionchallenge.constants import CURRENT_YEAR
+from common.constants import CURRENT_YEAR
 from directors.models import Director
 
 

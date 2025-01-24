@@ -6,7 +6,7 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
 from categories.utils import get_category_films
-from criterionchallenge.constants import CURRENT_YEAR
+from common.constants import CURRENT_YEAR
 from films.models import Film
 from picks.models import Pick
 from picks.utils import generate_picks

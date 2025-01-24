@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, render
 
 from categories.models import Category
 from categories.utils import get_category_films, len_or_warning
-from criterionchallenge.constants import CURRENT_YEAR
+from common.constants import CURRENT_YEAR
 from users.models import UserWatched, UserWatchlist
 
 

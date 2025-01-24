@@ -1,6 +1,6 @@
 from django import forms
 
-from criterionchallenge.constants import CURRENT_YEAR
+from common.constants import CURRENT_YEAR
 from picks.models import Pick
 
 

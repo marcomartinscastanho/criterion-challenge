@@ -2,7 +2,7 @@ from django.db.models import QuerySet
 
 from categories.models import Category
 from categories.utils import get_category_films
-from criterionchallenge.constants import CURRENT_YEAR
+from common.constants import CURRENT_YEAR
 from films.models import Film
 from picks.models import Pick
 from users.models import User, UserWatched, UserWatchlist
