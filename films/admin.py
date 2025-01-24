@@ -11,6 +11,7 @@ from picks.models import Pick
 from users.models import UserWatched, UserWatchlist
 
 
+# XXX: can be removed soon
 @admin.action(description="Change cc_id of selected Films to max available")
 def change_cc_id_to_max(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet[Film]):
     """
@@ -77,7 +78,16 @@ def generate_sql_inserts(modeladmin: admin.ModelAdmin, request: HttpRequest, que
 
 
 class FilmAdmin(admin.ModelAdmin):
-    list_display = ["cc_id", "spine", "title", "get_directors", "country", "year", "letterboxd_link", "get_categories"]
+    list_display = [
+        "cc_id",
+        "spine",
+        "title",
+        "get_directors",
+        "get_countries",
+        "year",
+        "letterboxd_link",
+        "get_categories",
+    ]
     list_display_links = ["title"]
     search_fields = ["title", "letterboxd"]
     filter_horizontal = ["directors"]
@@ -90,6 +100,10 @@ class FilmAdmin(admin.ModelAdmin):
     @admin.display(description="Director", ordering="directors__name")
     def get_directors(self, obj: Film):
         return ", ".join([director.name for director in obj.directors.all()])
+
+    @admin.display(description="Country", ordering="countries__name")
+    def get_countries(self, obj: Film):
+        return ", ".join([country.name for country in obj.countries.all()])
 
     @admin.display(description="Categories")
     def get_categories(self, obj: Film):

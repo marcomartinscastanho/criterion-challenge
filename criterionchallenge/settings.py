@@ -148,6 +148,7 @@ JAZZMIN_SETTINGS = {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
         "categories.Category": "fa-solid fa-list",
+        "common.Country": "fa-solid fa-globe",
         "directors.Director": "fa-solid fa-clapperboard",
         "films.Film": "fa-solid fa-film",
         "picks.Pick": "fa-solid fa-check",
