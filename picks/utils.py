@@ -1,9 +1,8 @@
-from django.db.models import QuerySet
+from django.db.models import Count, Q
 
 from categories.models import Category
 from categories.utils import get_category_films
 from common.constants import CURRENT_YEAR
-from films.models import Film
 from picks.models import Pick
 from users.models import User, UserWatched, UserWatchlist
 
@@ -12,49 +11,33 @@ class NoChoicesLeft(Exception):
     pass
 
 
-def pick_film(watchlisted: QuerySet[Film], all: QuerySet[Film], picked: list[Film]) -> Film:
-    for film in watchlisted:
-        if film in picked:
-            continue
-        return film
-    for film in all:
-        if film in picked:
-            continue
-        return film
-    raise NoChoicesLeft
-
-
 def generate_picks(user: User):
-    user_watched_qs = UserWatched.objects.filter(user=user).values("films")
-    user_watchlist_qs = UserWatchlist.objects.filter(user=user).values("films")
-    categories_stats = []
-    for category in Category.objects.filter(year=CURRENT_YEAR):
-        all_category_films = get_category_films(category, user, user_watched_qs, user_watchlist_qs)
-        unwatched_films = all_category_films.exclude(pk__in=user_watched_qs).order_by("?")
-        watchlisted_films = unwatched_films.filter(pk__in=user_watchlist_qs)
-        categories_stats.append(
-            {
-                "number": category.number,
-                "category": category,
-                "films": unwatched_films,
-                "films_count": len(unwatched_films),
-                "watchlisted_films": watchlisted_films,
-                "watchlisted_films_count": len(watchlisted_films),
-            }
-        )
-    categories_stats = sorted(
-        categories_stats, key=lambda x: (x["watchlisted_films_count"], x["films_count"], x["number"])
-    )
+    user_watched_ids = UserWatched.objects.filter(user=user).values_list("films__pk", flat=True)
+    user_watchlist_ids = UserWatchlist.objects.filter(user=user).values_list("films__pk", flat=True)
+    # Fetch existing picks to avoid duplicates
     existing_picks = Pick.objects.filter(user=user, year=CURRENT_YEAR)
-    picked_films = set(existing_picks.values_list("film", flat=True))
-    picked_categories = set(existing_picks.values_list("category", flat=True))
-    for category_stats in categories_stats:
-        category = category_stats["category"]
-        if category in picked_categories:
+    picked_film_ids = set(existing_picks.values_list("film__pk", flat=True))
+    picked_category_ids = set(existing_picks.values_list("category__pk", flat=True))
+    # Fetch all categories for the current year
+    categories = Category.objects.filter(year=CURRENT_YEAR)
+    # Iterate through categories and create picks
+    for category in categories:
+        if category.id in picked_category_ids:
             continue
-        try:
-            film = pick_film(category_stats["watchlisted_films"], category_stats["films"], picked_films)
+        # Get eligible films for the category
+        all_category_films = get_category_films(
+            category=category,
+            user=user,
+            user_watched_qs=user_watched_ids,
+            user_watchlist_qs=user_watchlist_ids,
+        )
+        # Randomize and prioritize watchlisted films
+        all_category_films = (
+            all_category_films.exclude(pk__in=user_watched_ids)
+            .annotate(is_watchlisted=Count("pk", filter=Q(pk__in=user_watchlist_ids)))
+            .order_by("-is_watchlisted", "?")
+        )
+        film = next((film for film in all_category_films if film.pk not in picked_film_ids), None)
+        if film:
             Pick.objects.create(user=user, year=CURRENT_YEAR, category=category, film=film)
-            picked_films.add(film)
-        except Exception:
-            continue
+            picked_film_ids.add(film.pk)

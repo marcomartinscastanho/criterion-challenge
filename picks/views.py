@@ -16,26 +16,28 @@ from users.models import User, UserWatched, UserWatchlist
 @login_required
 def picks(request: HttpRequest):
     user: User = request.user
-    user_watched_qs = UserWatched.objects.filter(user=user).values("films")
-    user_watchlist_qs = UserWatchlist.objects.filter(user=user).values("films")
+    # Precompute watched and watchlisted films as sets for quick lookups
+    watched_film_ids = UserWatched.objects.filter(user=user).values_list("films__pk", flat=True)
+    watchlisted_film_ids = UserWatchlist.objects.filter(user=user).values_list("films__pk", flat=True)
+    # Fetch all picks for the user in the current year
+    picks_qs = Pick.objects.select_related("category", "film").filter(user=user, year=CURRENT_YEAR)
+    # Collect all films picked by the user in the current year (for `is_picked` checks)
+    picked_film_ids = set(picks_qs.values_list("film__pk", flat=True))
     picks = []
-    picks_qs = Pick.objects.select_related("category").filter(user=user).filter(year=CURRENT_YEAR)
     for pick in picks_qs:
-        all_category_films = get_category_films(pick.category, user, user_watched_qs, user_watchlist_qs)
         category = pick.category
+        # Use `get_category_films` to calculate eligible films for the category
+        all_category_films = get_category_films(category, user, watched_film_ids, watchlisted_film_ids)
         films = []
-        other_picks = picks_qs.exclude(pk=pick.pk)
         for film in all_category_films:
-            is_picked = other_picks.values("film").filter(film=film).exists()
-            is_watched = user_watched_qs.filter(films=film).exists()
-            is_watchlisted = user_watchlist_qs.filter(films=film).exists()
+            film_id = film.pk
             films.append(
                 {
                     "cc_id": film.cc_id,
                     "title": film.title,
                     "year": film.year,
-                    "disabled": is_picked or is_watched,
-                    "watchlisted": is_watchlisted,
+                    "disabled": (film_id in picked_film_ids) or (film_id in watched_film_ids),
+                    "watchlisted": film_id in watchlisted_film_ids,
                 }
             )
         picks.append(
@@ -47,7 +49,6 @@ def picks(request: HttpRequest):
                 "category": {"title": category.title, "films": films},
             }
         )
-
     return render(request, "picks.html", {"picks": picks})
 
 
