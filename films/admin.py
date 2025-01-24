@@ -1,77 +1,52 @@
 from django.contrib import admin
-from django.db import transaction
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.utils.html import format_html
 
-from categories.models import Category
+from common.models import Country
 from common.utils import get_object_sql_insert
+from directors.models import Director
 from films.models import Film
-from picks.models import Pick
-from users.models import UserWatched, UserWatchlist
 
 
-# XXX: can be removed soon
-@admin.action(description="Change cc_id of selected Films to max available")
-def change_cc_id_to_max(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet[Film]):
-    """
-    Admin action to change the cc_id of selected Film objects to the maximum available ID.
-    """
-    max_id = 2147483647  # Maximum value for PositiveIntegerField
-    existing_ids = set(Film.objects.values_list("cc_id", flat=True))
-    available_ids = (id for id in range(max_id, 0, -1) if id not in existing_ids)
+def get_countries_sql_inserts(obj: Film) -> list[str]:
+    m2m_field = getattr(obj, "countries")
+    countries: QuerySet[Country] = m2m_field.all()
+    queries = []
+    for country in countries:
+        queries.append(
+            f"INSERT INTO films_film_countries (film_id, country_id) "
+            "SELECT f.id, c.id "
+            f"FROM {Film._meta.db_table} f, {Country._meta.db_table} c "
+            f"WHERE f.cc_id = {obj.cc_id} AND c.id = {country.pk};"
+        )
+    return queries
 
-    updated_objects = []
-    for film in queryset:
-        with transaction.atomic():  # Ensure atomicity for the entire operation
-            try:
-                new_id = next(available_ids)  # Get the next available ID
-            except StopIteration:
-                modeladmin.message_user(request, "No available IDs left to assign.", level="error")
-                return
 
-            # Create a new Film object with the new cc_id
-            old_id = film.cc_id
-            film.pk = new_id  # Assign the new primary key
-            film.save()  # This creates a new object with the updated ID
-
-            old_film = Film.objects.get(cc_id=old_id)
-            # Update Film Director
-            new_film = Film.objects.get(cc_id=new_id)
-            new_film.directors.set(old_film.directors.all())
-            # Update Categories
-            categories: QuerySet[Category] = old_film.categories.all()
-            for category in categories:
-                category.films.remove(old_film)
-                category.films.add(new_film)
-            # Update Picks
-            picks: QuerySet[Pick] = old_film.picks.all()
-            for pick in picks:
-                pick.film = new_film
-                pick.save()
-            # Update UserWatched
-            user_watched = UserWatched.objects.filter(films=old_film)
-            for watched in user_watched:
-                watched.films.remove(old_film)
-                watched.films.add(new_film)
-            user_watchlist = UserWatchlist.objects.filter(films=old_film)
-            for watchlist in user_watchlist:
-                watchlist.films.remove(old_film)
-                watchlist.films.add(new_film)
-            # # Delete the old object
-            Film.objects.filter(cc_id=old_id).delete()
-
-            updated_objects.append((old_id, new_id))
-
-    modeladmin.message_user(request, f"Successfully updated cc_id for {len(updated_objects)} Film objects.")
+def get_directors_sql_inserts(obj: Film) -> list[str]:
+    m2m_field = getattr(obj, "directors")
+    directors: QuerySet[Director] = m2m_field.all()
+    queries = []
+    for director in directors:
+        queries.append(
+            f"INSERT INTO films_film_directors (film_id, director_id) "
+            "SELECT f.id, d.id "
+            f"FROM {Film._meta.db_table} f, {Director._meta.db_table} d "
+            f"WHERE f.cc_id = {obj.cc_id} AND d.id = {director.pk};"
+        )
+    return queries
 
 
 @admin.action(description="Generate SQL queries")
 def generate_sql_inserts(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet[Film]) -> None:
     queries = []
-    for film in queryset.order_by("cc_id"):
+    for film in Film.objects.all():
         sql_query = get_object_sql_insert(film)
         queries.append(sql_query)
+        countries_m2m_queries = get_countries_sql_inserts(film)
+        queries.extend(countries_m2m_queries)
+        directors_m2m_queries = get_directors_sql_inserts(film)
+        queries.extend(directors_m2m_queries)
 
     joined_queries = "<br>".join(queries)
     modeladmin.message_user(request, format_html(f"<pre>{joined_queries}</pre>"))

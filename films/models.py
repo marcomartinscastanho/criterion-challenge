@@ -9,7 +9,7 @@ from directors.models import Director
 
 
 class Film(models.Model):
-    cc_id = models.PositiveIntegerField(primary_key=True)
+    cc_id = models.PositiveIntegerField(null=True, blank=True)
     title = models.CharField(max_length=200)
     spine = models.PositiveIntegerField(null=True, blank=True)
     year = models.PositiveIntegerField(null=True, blank=True, validators=[MinValueValidator(1870)])

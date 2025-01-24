@@ -11,29 +11,15 @@ from films.models import Film
 
 
 def get_m2m_sql_inserts(obj: Category, m2m_field_name: str) -> list[str]:
-    """
-    Generate SQL INSERT queries for the ManyToMany relationship of the given object.
-
-    Args:
-        obj (Model): The model instance with a ManyToMany field.
-        m2m_field_name (str): The name of the ManyToMany field.
-
-    Returns:
-        list[str]: A list of SQL INSERT queries for the pivot table.
-    """
-    table = obj._meta.db_table
     m2m_field = getattr(obj, m2m_field_name)
     films: QuerySet[Film] = m2m_field.all()
-    pivot_table = m2m_field.through._meta.db_table
     queries = []
     for film in films.order_by("cc_id"):
         queries.append(
-            f"INSERT INTO {pivot_table} (category_id, film_id) "
-            "SELECT c.id, f.cc_id "
-            f"FROM {table} c "
-            "JOIN films_film f "
-            f"ON f.cc_id = {film.pk} "
-            f"WHERE c.year = {CURRENT_YEAR} AND c.number = {obj.number};"
+            f"INSERT INTO {Category.films.through._meta.db_table} (category_id, film_id) "
+            "SELECT c.id, f.id "
+            f"FROM {Category._meta.db_table} c, {Film._meta.db_table} f "
+            f"WHERE c.number = {obj.number} AND f.cc_id = {film.cc_id};"
         )
     return queries
 
