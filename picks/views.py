@@ -33,7 +33,7 @@ def picks(request: HttpRequest):
             film_id = film.pk
             films.append(
                 {
-                    "cc_id": film.cc_id,
+                    "id": film_id,
                     "title": film.title,
                     "year": film.year,
                     "disabled": (film_id in picked_film_ids) or (film_id in watched_film_ids),
@@ -64,12 +64,12 @@ def complete_picks(request: HttpRequest):
 @require_http_methods(["PATCH"])
 def update_pick(request: HttpRequest, pick_id: int):
     data = json.loads(request.body)
-    film_cc_id = data.get("film_cc_id")
+    film_id = data.get("film_id")
     locked = data.get("locked")
     try:
         pick = Pick.objects.get(id=pick_id, user=request.user)
-        if film_cc_id:
-            pick.film = Film.objects.get(cc_id=film_cc_id)
+        if film_id:
+            pick.film = Film.objects.get(pk=film_id)
         if locked is not None:
             pick.locked = locked
         pick.save()

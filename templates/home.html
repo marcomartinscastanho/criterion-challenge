@@ -46,7 +46,7 @@
       if (event.target.classList.contains("form-select")) {
         const pickId = event.target.dataset.pickId;
         const filmId = event.target.value;
-        updatePick(pickId, { film_cc_id: filmId });
+        updatePick(pickId, { film_id: filmId });
       } else if (event.target.classList.contains("form-check-input")) {
         const pickId = event.target.dataset.pickId;
         const locked = event.target.checked;

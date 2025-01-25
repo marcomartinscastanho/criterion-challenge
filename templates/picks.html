@@ -22,9 +22,9 @@
                     aria-label="{{ pick.category.title }}"
                     {% if pick.locked %}disabled{% endif %}>
               {% for film in pick.category.films %}
-                <option value="{{ film.cc_id }}"
+                <option value="{{ film.id }}"
                         {% if film.disabled %}disabled{% endif %}
-                        {% if pick.film.cc_id == film.cc_id %}selected{% endif %}>
+                        {% if pick.film.id == film.id %}selected{% endif %}>
                   {{ film.title }} ({{ film.year }})
                   {% if film.watchlisted %}*{% endif %}
                 </option>
