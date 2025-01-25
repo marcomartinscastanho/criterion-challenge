@@ -10,7 +10,7 @@ from directors.models import Director
 @admin.action(description="Generate SQL queries")
 def generate_sql_inserts(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet[Director]) -> None:
     queries = []
-    for director in Director.objects.all():
+    for director in Director.objects.all().order_by("pk"):
         sql_query = get_object_sql_insert(director)
         queries.append(sql_query)
 

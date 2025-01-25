@@ -6,33 +6,29 @@ from django.utils.html import format_html
 from common.models import Country
 from common.utils import get_object_sql_insert
 from directors.models import Director
-from films.models import Film
+from films.models import Film, FilmSession
 
 
-def get_countries_sql_inserts(obj: Film) -> list[str]:
-    m2m_field = getattr(obj, "countries")
-    countries: QuerySet[Country] = m2m_field.all()
+def get_countries_sql_inserts(film: Film) -> list[str]:
     queries = []
-    for country in countries:
+    for country in film.countries.all():
         queries.append(
             f"INSERT INTO films_film_countries (film_id, country_id) "
             "SELECT f.id, c.id "
             f"FROM {Film._meta.db_table} f, {Country._meta.db_table} c "
-            f"WHERE f.cc_id = {obj.cc_id} AND c.id = {country.pk};"
+            f"WHERE f.cc_id = {film.cc_id} AND c.id = {country.pk};"
         )
     return queries
 
 
-def get_directors_sql_inserts(obj: Film) -> list[str]:
-    m2m_field = getattr(obj, "directors")
-    directors: QuerySet[Director] = m2m_field.all()
+def get_directors_sql_inserts(film: Film) -> list[str]:
     queries = []
-    for director in directors:
+    for director in film.directors.all():
         queries.append(
             f"INSERT INTO films_film_directors (film_id, director_id) "
             "SELECT f.id, d.id "
             f"FROM {Film._meta.db_table} f, {Director._meta.db_table} d "
-            f"WHERE f.cc_id = {obj.cc_id} AND d.id = {director.pk};"
+            f"WHERE f.cc_id = {film.cc_id} AND d.id = {director.pk};"
         )
     return queries
 
@@ -86,3 +82,4 @@ class FilmAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Film, FilmAdmin)
+admin.site.register(FilmSession)

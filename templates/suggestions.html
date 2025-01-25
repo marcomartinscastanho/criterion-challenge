@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1 class="mb-4">Pick Suggestions</h1>
+    {% if suggested_changes %}
+        {% for suggestion in suggested_changes %}
+            <div class="card mb-2">
+                <div class="card-header">
+                    <h4>Category {{ suggestion.category_number }}: {{ suggestion.category_title }}</h4>
+                </div>
+                <div class="card-body">
+                    <h5>
+                        <strong>Current Pick:</strong>
+                        {% if suggestion.pick %}
+                            {{ suggestion.pick.film.title }} ({{ suggestion.pick.film.year }})
+                        {% else %}
+                            <em>None</em>
+                        {% endif %}
+                    </h5>
+                    {% if suggestion.alternatives %}
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Film</th>
+                                    <th>In your Watchlist</th>
+                                    <th>Sessions</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for alternative in suggestion.alternatives %}
+                                    <tr>
+                                        <td class="align-middle">{{ alternative.film.title }} ({{ alternative.film.year }})</td>
+                                        <td class="align-middle">
+                                            {% if alternative.watchlisted %}
+                                                <span class="badge bg-success">Yes</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">No</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="align-middle">
+                                            <div class="d-flex flex-column gap-2">
+                                                {% for session in alternative.sessions %}
+                                                    <div>
+                                                        <strong>Venue:</strong> {{ session.venue }}
+                                                        <br />
+                                                        <strong>Time:</strong> {{ session.datetime|date:"F j, Y, g:i a" }}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </td>
+                                        <td class="align-middle">
+                                            {% if suggestion.pick %}
+                                                <button class="btn btn-primary"
+                                                        onclick="updatePick({{ suggestion.pick.id }}, {{ alternative.film.id }})">
+                                                    Pick
+                                                </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-muted">No alternatives available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+        <script>
+            function updatePick(pickId, filmId) {
+                fetch(`/picks/update/${pickId}/`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify({ film_id: filmId }),
+                })
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error("Failed to update pick");
+                })
+                .then((data) => {
+                    window.location.href = "/";
+                })
+                .catch((error) => {
+                    console.error(error);
+                    alert("Failed to update pick.");
+                });
+            }
+        </script>
+    {% else %}
+        <p class="text-muted">No category suggestions available at this time.</p>
+    {% endif %}
+{% endblock content %}

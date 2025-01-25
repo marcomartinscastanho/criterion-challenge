@@ -50,8 +50,13 @@
     </tbody>
   </table>
   <small>* in your watchlist</small>
-  <div class="my-2">
-    <a href="{% url 'complete_picks' %}" class="btn btn-primary">Regenerate Picks</a>
+  <div class="my-2 d-flex gap-2">
+    <div>
+      <a href="{% url 'complete_picks' %}" class="btn btn-primary">Randomize Picks</a>
+    </div>
+    <div>
+      <a href="{% url 'suggestions' %}" class="btn btn-primary">Check Film Sessions</a>
+    </div>
   </div>
 {% else %}
   <a href="{% url 'complete_picks' %}" class="btn btn-primary">Generate Picks</a>
