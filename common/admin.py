@@ -3,7 +3,7 @@ from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.utils.html import format_html
 
-from common.models import Country, Venue
+from common.models import Country, Genre, Venue
 from common.utils import get_object_sql_insert
 
 
@@ -23,4 +23,5 @@ class CountryAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Country, CountryAdmin)
+admin.site.register(Genre)
 admin.site.register(Venue)

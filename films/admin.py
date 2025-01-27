@@ -7,6 +7,7 @@ from common.models import Country
 from common.utils import get_object_sql_insert
 from directors.models import Director
 from films.models import Film, FilmSession
+from films.utils import enrich_film_details
 
 
 def get_countries_sql_inserts(film: Film) -> list[str]:
@@ -48,21 +49,21 @@ def generate_sql_inserts(modeladmin: admin.ModelAdmin, request: HttpRequest, que
     modeladmin.message_user(request, format_html(f"<pre>{joined_queries}</pre>"))
 
 
+@admin.action(description="Get TMDB data")
+def get_tmdb_data(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet[Film]) -> None:
+    # TODO: make this async if queryset.count() is large (> 50, e.g.)
+    for film in queryset:
+        enrich_film_details(film)
+
+
 class FilmAdmin(admin.ModelAdmin):
-    list_display = [
-        "cc_id",
-        "spine",
-        "title",
-        "get_directors",
-        "get_countries",
-        "year",
-        "letterboxd_link",
-        "get_categories",
-    ]
+    list_display = ["title", "get_directors", "year", "get_countries", "get_genres", "runtime", "letterboxd_link"]
     list_display_links = ["title"]
     search_fields = ["title", "letterboxd"]
     filter_horizontal = ["directors"]
-    actions = [generate_sql_inserts]
+    actions = [generate_sql_inserts, get_tmdb_data]
+
+    # TODO: create a separation in the form for external data (letterboxd url, cc_id, cc spine, tmdb id)
 
     @admin.display(description="Letterboxd", ordering="letterboxd")
     def letterboxd_link(self, obj: Film):
@@ -76,9 +77,9 @@ class FilmAdmin(admin.ModelAdmin):
     def get_countries(self, obj: Film):
         return ", ".join([country.name for country in obj.countries.all()])
 
-    @admin.display(description="Categories")
-    def get_categories(self, obj: Film):
-        return f"{obj.current_categories_count}: " + ", ".join([category.title for category in obj.current_categories])
+    @admin.display(description="Genres", ordering="genres__name")
+    def get_genres(self, obj: Film):
+        return ", ".join([genre.name for genre in obj.genres.all()])
 
 
 admin.site.register(Film, FilmAdmin)
