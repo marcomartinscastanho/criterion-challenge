@@ -149,6 +149,7 @@ JAZZMIN_SETTINGS = {
         "auth.user": "fas fa-user",
         "categories.Category": "fa-solid fa-list",
         "common.Country": "fa-solid fa-globe",
+        "common.Gender": "fa-solid fa-venus-mars",
         "common.Genre": "fa-solid fa-masks-theater",
         "common.Keyword": "fa-solid fa-tags",
         "common.Region": "fa-solid fa-earth-africa",

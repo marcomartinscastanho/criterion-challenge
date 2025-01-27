@@ -1,7 +1,7 @@
 from django.db.models import QuerySet
 from thefuzz import process
 
-from common.models import Country, Genre, Keyword, Region
+from common.models import Country, Gender, Genre, Keyword, Region
 from common.tmdb.tmdb import get_film, get_movie_details
 from directors.models import Director
 from films.models import Film
@@ -32,7 +32,6 @@ def enrich_film_details(film: Film):
         # save the tmdb_id
         if not film.tmdb_id and "tmdb_id" in tmdb_data and isinstance(tmdb_data["tmdb_id"], int):
             film.tmdb_id = tmdb_data["tmdb_id"]
-
         if "countries" in tmdb_data and isinstance(tmdb_data["countries"], list):
             film_countries = film.countries.values_list("code", flat=True)
             for country_dict in tmdb_data["countries"]:
@@ -147,6 +146,12 @@ def resolve_foreign_key(fk: str, query: dict):
         try:
             return Director.objects.get(**{key: value})
         except Director.DoesNotExist:
+            return Director.objects.none()
+    if fk == "genders":
+        try:
+            gender = Gender.objects.get(**{key: value})
+            return Director.objects.filter(gender=gender)
+        except Gender.DoesNotExist:
             return Director.objects.none()
     if fk == "genres":
         if isinstance(value, list):

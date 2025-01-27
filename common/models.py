@@ -13,6 +13,16 @@ class Country(models.Model):
         return self.name
 
 
+class Gender(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
 class Genre(models.Model):
     name = models.CharField(max_length=100, unique=True)
 

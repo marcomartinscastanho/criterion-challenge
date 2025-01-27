@@ -3,7 +3,7 @@ from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.utils.html import format_html
 
-from common.models import Country, Genre, Keyword, Region, Venue
+from common.models import Country, Gender, Genre, Keyword, Region, Venue
 from common.utils import get_object_sql_insert
 
 
@@ -19,7 +19,7 @@ def generate_sql_inserts(modeladmin: admin.ModelAdmin, request: HttpRequest, que
 
 
 class CountryAdmin(admin.ModelAdmin):
-    list_display = ["name", "get_regions"]
+    list_display = ["code", "name", "get_regions"]
     actions = [generate_sql_inserts]
 
     @admin.display(description="Regions", ordering="regions__name")
@@ -37,6 +37,7 @@ class RegionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Country, CountryAdmin)
+admin.site.register(Gender)
 admin.site.register(Genre)
 admin.site.register(Keyword)
 admin.site.register(Region, RegionAdmin)

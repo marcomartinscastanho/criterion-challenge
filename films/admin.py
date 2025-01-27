@@ -51,7 +51,6 @@ def generate_sql_inserts(modeladmin: admin.ModelAdmin, request: HttpRequest, que
 
 @admin.action(description="Get TMDB data")
 def get_tmdb_data(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet[Film]) -> None:
-    # TODO: make this async if queryset.count() is large (> 50, e.g.)
     for film in queryset:
         enrich_film_details(film)
 

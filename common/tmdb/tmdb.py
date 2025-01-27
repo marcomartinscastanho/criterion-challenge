@@ -5,11 +5,13 @@ from cerberus import Validator
 from django.conf import settings
 from ratelimit import limits, sleep_and_retry
 
-from common.tmdb.schemas import MOVIE_DETAILS_SCHEMA, SEARCH_MOVIE_SCHEMA
+from common.tmdb.schemas import MOVIE_DETAILS_SCHEMA, SEARCH_DIRECTOR_SCHEMA, SEARCH_MOVIE_SCHEMA
 
 MAX_CALLS = 45
 ONE_SECONDS = 1
 TMDB_API_URL = "https://api.themoviedb.org/3"
+
+TMDB_GENDER_MAP = {0: None, 1: "Female", 2: "Male", 3: "Non-binary"}
 
 
 class APIError(Exception):
@@ -30,6 +32,20 @@ def call_tmdb_api(path: str, query_params: dict = {}):
     if response.status_code != 200:
         raise APIError
     return response.json()
+
+
+def search_director(name: str):
+    v = Validator(SEARCH_DIRECTOR_SCHEMA, allow_unknown=True)
+    body = call_tmdb_api("search/person", {"query": name})
+    validated_data = v.validated(body)
+    if not validated_data:
+        raise ValueError(f"Validation failed: {v.errors}")
+    top_result = validated_data["results"][0]
+    tmdb_id = top_result["id"]
+    gender = TMDB_GENDER_MAP[top_result["gender"]]
+    known_for_department = top_result["known_for_department"]
+    films = [film["title"] for film in top_result["known_for"] if "title" in film]
+    return {"tmdb_id": tmdb_id, "gender": gender, "known_for_department": known_for_department, "films": films}
 
 
 def search_movie(title: str, year: int) -> int:

@@ -1,3 +1,26 @@
+SEARCH_DIRECTOR_SCHEMA = {
+    "total_results": {"type": "integer", "required": True, "min": 1},
+    "results": {
+        "type": "list",
+        "required": True,
+        "minlength": 1,
+        "schema": {
+            "type": "dict",
+            "schema": {
+                "id": {"type": "integer", "required": True, "min": 0},
+                "gender": {"type": "integer", "required": True, "min": 0},
+                "known_for_department": {"type": "string", "required": True},
+                "known_for": {
+                    "type": "list",
+                    "required": True,
+                    "schema": {"type": "dict", "schema": {"title": {"type": "string", "required": False}}},
+                },
+            },
+        },
+    },
+}
+
+
 SEARCH_MOVIE_SCHEMA = {
     "total_results": {"type": "integer", "required": True, "min": 1},
     "results": {
