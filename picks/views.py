@@ -30,7 +30,7 @@ def picks(request: HttpRequest):
     for pick in picks_qs:
         category = pick.category
         # Use `get_category_films` to calculate eligible films for the category
-        all_category_films = get_category_films(category, user, watched_film_ids, watchlisted_film_ids)
+        all_category_films = get_category_films(category, user)
         films = []
         for film in all_category_films:
             film_id = film.pk
@@ -97,7 +97,7 @@ def suggestions(request: HttpRequest):
     suggested_changes = []
     for category in categories:
         # Get films eligible for the category
-        category_films = get_category_films(category, user, watched_film_ids, watchlisted_film_ids)
+        category_films = get_category_films(category, user)
         # Filter out films already picked or watched
         eligible_films = category_films.exclude(Q(pk__in=watched_film_ids) | Q(pk__in=picked_film_ids))
         # Fetch future sessions for eligible films

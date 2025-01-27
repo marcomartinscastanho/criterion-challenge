@@ -37,6 +37,7 @@ class Category(models.Model):
         if self.custom_criteria:
             try:
                 json.dumps(self.custom_criteria)
+                # TODO: validate custom_criteria against a schema with Cerberus
             except (TypeError, ValueError) as e:
                 raise ValidationError(f"Invalid JSON in custom_criteria: {e}")
 

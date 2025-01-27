@@ -15,7 +15,7 @@ def categories(request: HttpRequest):
     user_watchlist_qs = UserWatchlist.objects.filter(user=user).values("films")
     category_list = []
     for category in Category.objects.filter(year=CURRENT_YEAR).order_by("number"):
-        films = get_category_films(category, user, user_watched_qs, user_watchlist_qs)
+        films = get_category_films(category, user)
         user_watched_films = films.filter(pk__in=user_watched_qs)
         user_watchlist_films = films.filter(pk__in=user_watchlist_qs)
         category_list.append(
@@ -37,7 +37,7 @@ def category_detail(request, category_id):
     category = get_object_or_404(Category, id=category_id)
     user_watched_qs = UserWatched.objects.filter(user=user).values("films")
     user_watchlist_qs = UserWatchlist.objects.filter(user=user).values("films")
-    films = get_category_films(category, user, user_watched_qs, user_watchlist_qs)
+    films = get_category_films(category, user)
     film_objects = [
         {
             "title": film.title,

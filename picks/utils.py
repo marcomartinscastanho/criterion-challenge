@@ -25,12 +25,7 @@ def generate_picks(user: User):
         if category.id in picked_category_ids:
             continue
         # Get eligible films for the category
-        all_category_films = get_category_films(
-            category=category,
-            user=user,
-            user_watched_qs=user_watched_ids,
-            user_watchlist_qs=user_watchlist_ids,
-        )
+        all_category_films = get_category_films(category=category, user=user)
         # Randomize and prioritize watchlisted films
         all_category_films = (
             all_category_films.exclude(pk__in=user_watched_ids)

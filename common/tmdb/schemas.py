@@ -48,4 +48,15 @@ MOVIE_DETAILS_SCHEMA = {
         },
     },
     "runtime": {"type": "integer", "required": True, "min": 1},
+    "keywords": {
+        "type": "dict",
+        "required": True,
+        "schema": {
+            "keywords": {
+                "type": "list",
+                "required": True,
+                "schema": {"type": "dict", "schema": {"name": {"type": "string", "required": True}}},
+            }
+        },
+    },
 }

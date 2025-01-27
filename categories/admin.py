@@ -41,6 +41,7 @@ class FilmsInline(admin.TabularInline):
     model = Film.categories.through
     extra = 0
     can_delete = False
+    verbose_name = "Film"
 
     def get_queryset(self, request):
         """

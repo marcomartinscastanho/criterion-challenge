@@ -150,6 +150,8 @@ JAZZMIN_SETTINGS = {
         "categories.Category": "fa-solid fa-list",
         "common.Country": "fa-solid fa-globe",
         "common.Genre": "fa-solid fa-masks-theater",
+        "common.Keyword": "fa-solid fa-tags",
+        "common.Region": "fa-solid fa-earth-africa",
         "common.Venue": "fa-solid fa-building",
         "directors.Director": "fa-solid fa-clapperboard",
         "films.Film": "fa-solid fa-film",
@@ -166,3 +168,5 @@ TMDB_API_TOKEN = os.getenv("TMDB_API_TOKEN")
 
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 2048

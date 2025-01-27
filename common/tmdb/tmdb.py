@@ -43,11 +43,10 @@ def search_movie(title: str, year: int) -> int:
 
 def get_movie_details(id: int):
     v = Validator(MOVIE_DETAILS_SCHEMA, allow_unknown=True)
-    body = call_tmdb_api(f"movie/{id}", {"append_to_response": "credits"})
+    body = call_tmdb_api(f"movie/{id}", {"append_to_response": "credits,keywords"})
     validated_data = v.validated(body)
     if not validated_data:
         raise ValueError(f"Validation failed: {v.errors}")
-    genres = [genre["name"] for genre in validated_data["genres"]]
     countries = [
         {"code": country["iso_3166_1"], "name": country["name"]} for country in validated_data["production_countries"]
     ]
@@ -55,9 +54,17 @@ def get_movie_details(id: int):
     directors = [
         crew_credit["name"] for crew_credit in validated_data["credits"]["crew"] if crew_credit["job"] == "Director"
     ]
+    genres = [genre["name"] for genre in validated_data["genres"]]
+    keywords = [keyword["name"] for keyword in validated_data["keywords"]["keywords"]]
     runtime = validated_data["runtime"]
-
-    return {"tmdb_id": id, "genres": genres, "countries": countries, "directors": directors, "runtime": runtime}
+    return {
+        "tmdb_id": id,
+        "countries": countries,
+        "directors": directors,
+        "genres": genres,
+        "keywords": keywords,
+        "runtime": runtime,
+    }
 
 
 def get_film(title: str, year: int):

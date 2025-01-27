@@ -3,7 +3,7 @@ from datetime import datetime
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from common.models import Country, Genre, Venue
+from common.models import Country, Genre, Keyword, Venue
 from directors.models import Director
 
 # TODO: custom queryset that creates filters for QuerySet[Film] such as:
@@ -22,6 +22,7 @@ class Film(models.Model):
     countries = models.ManyToManyField(Country, related_name="films")
     genres = models.ManyToManyField(Genre, related_name="films", blank=True)
     runtime = models.PositiveIntegerField(null=True, blank=True)
+    keywords = models.ManyToManyField(Keyword, related_name="films", blank=True)
     letterboxd = models.URLField(max_length=200)
     tmdb_id = models.PositiveIntegerField(null=True, blank=True, unique=True)
     cc_id = models.PositiveIntegerField(null=True, blank=True, unique=True)
@@ -32,6 +33,8 @@ class Film(models.Model):
 
     def __str__(self):
         return self.title
+
+    # TODO: on save(), if not self.tmdb_id -> get tmdb data
 
 
 class FilmSession(models.Model):
