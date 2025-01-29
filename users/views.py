@@ -42,6 +42,7 @@ def profile(request: HttpRequest):
                         tmdb_id = scrape_letterboxd_for_tmdb_id(uri)
                         if not tmdb_id:
                             print(f"Skipping {title} ({year}) - tmdb_id not found in letterboxd page")
+                            continue
                         film = Film.objects.create(title=title, year=year, letterboxd=uri, tmdb_id=tmdb_id)
                         enrich_film_details(film)
                     film_ids.append(film.pk)
