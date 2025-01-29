@@ -20,6 +20,29 @@ SEARCH_DIRECTOR_SCHEMA = {
     },
 }
 
+DIRECTOR_DETAILS_SCHEMA = {
+    "id": {"type": "integer", "required": True, "min": 1},
+    "gender": {"type": "integer", "required": True, "min": 0},
+    "movie_credits": {
+        "type": "dict",
+        "required": True,
+        "schema": {
+            "crew": {
+                "type": "list",
+                "required": True,
+                "schema": {
+                    "type": "dict",
+                    "schema": {
+                        "id": {"type": "integer", "required": True},
+                        "title": {"type": "string", "required": True},
+                        "job": {"type": "string", "required": True},
+                    },
+                },
+            }
+        },
+    },
+}
+
 
 SEARCH_MOVIE_SCHEMA = {
     "total_results": {"type": "integer", "required": True, "min": 1},
@@ -70,7 +93,7 @@ MOVIE_DETAILS_SCHEMA = {
             }
         },
     },
-    "runtime": {"type": "integer", "required": True, "min": 1},
+    "runtime": {"type": "integer", "required": True},
     "keywords": {
         "type": "dict",
         "required": True,

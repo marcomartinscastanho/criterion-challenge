@@ -3,6 +3,7 @@ from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.utils.html import format_html
 
+from common.letterboxd import scrape_letterboxd_for_tmdb_id
 from common.models import Country
 from common.utils import get_object_sql_insert
 from directors.models import Director
@@ -34,33 +35,47 @@ def get_directors_sql_inserts(film: Film) -> list[str]:
     return queries
 
 
-@admin.action(description="Generate SQL queries")
-def generate_sql_inserts(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet[Film]) -> None:
-    queries = []
-    for film in Film.objects.all():
-        sql_query = get_object_sql_insert(film)
-        queries.append(sql_query)
-        countries_m2m_queries = get_countries_sql_inserts(film)
-        queries.extend(countries_m2m_queries)
-        directors_m2m_queries = get_directors_sql_inserts(film)
-        queries.extend(directors_m2m_queries)
-
-    joined_queries = "<br>".join(queries)
-    modeladmin.message_user(request, format_html(f"<pre>{joined_queries}</pre>"))
-
-
-@admin.action(description="Get TMDB data")
-def get_tmdb_data(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet[Film]) -> None:
-    for film in queryset:
+def get_film_data(film: Film):
+    if not film.tmdb_id:
+        if not film.letterboxd:
+            # nothing we can do here
+            return
+        tmdb_id = scrape_letterboxd_for_tmdb_id(film.letterboxd)
+        if not tmdb_id:
+            print(f"Cant't get more deatils of {film} because we couldn't find the TMDB id")
+            # nothing else we can do here
+            return
+        film.tmdb_id = tmdb_id
+    # if we got here, there is tmdb_id
+    if not all(
+        [
+            film.directors.exists(),
+            film.countries.exists(),
+            film.genres.exists(),
+            film.keywords.exists(),
+            film.runtime,
+        ]
+    ):
         enrich_film_details(film)
 
 
 class FilmAdmin(admin.ModelAdmin):
-    list_display = ["title", "get_directors", "year", "get_countries", "get_genres", "runtime", "letterboxd_link"]
+    list_display = [
+        "id",
+        "title",
+        "get_directors",
+        "year",
+        "get_countries",
+        "get_genres",
+        "runtime",
+        "tmdb_id",
+        "cc_id",
+        "letterboxd_link",
+    ]
     list_display_links = ["title"]
-    search_fields = ["title", "letterboxd"]
+    search_fields = ["title", "letterboxd", "tmdb_id"]
     filter_horizontal = ["directors"]
-    actions = [generate_sql_inserts, get_tmdb_data]
+    actions = ["generate_sql_inserts", "get_tmdb_data"]
 
     # TODO: create a separation in the form for external data (letterboxd url, cc_id, cc spine, tmdb id)
 
@@ -79,6 +94,29 @@ class FilmAdmin(admin.ModelAdmin):
     @admin.display(description="Genres", ordering="genres__name")
     def get_genres(self, obj: Film):
         return ", ".join([genre.name for genre in obj.genres.all()])
+
+    @admin.action(description="Generate SQL queries")
+    def generate_sql_inserts(self, request: HttpRequest, queryset: QuerySet[Film]) -> None:
+        queries = []
+        for film in queryset:
+            sql_query = get_object_sql_insert(film)
+            queries.append(sql_query)
+            countries_m2m_queries = get_countries_sql_inserts(film)
+            queries.extend(countries_m2m_queries)
+            directors_m2m_queries = get_directors_sql_inserts(film)
+            queries.extend(directors_m2m_queries)
+
+        joined_queries = "<br>".join(queries)
+        self.message_user(request, format_html(f"<pre>{joined_queries}</pre>"))
+
+    @admin.action(description="Get TMDB data")
+    def get_tmdb_data(self, request: HttpRequest, queryset: QuerySet[Film]) -> None:
+        for film in queryset:
+            enrich_film_details(film)
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        get_film_data(form.instance)
 
 
 admin.site.register(Film, FilmAdmin)

@@ -4,7 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest
 from django.shortcuts import render
 
+from common.letterboxd import scrape_letterboxd_for_tmdb_id
 from films.models import Film
+from films.utils import enrich_film_details
 from users.forms import ProfileForm
 from users.models import UserWatched, UserWatchlist
 
@@ -29,10 +31,20 @@ def profile(request: HttpRequest):
                 reader = csv.DictReader(decoded_file)
                 film_ids = []
                 for row in reader:
+                    title = row["Name"]
+                    year = row["Year"]
                     uri = row["Letterboxd URI"]
-                    film = Film.objects.filter(letterboxd=uri).first()
-                    if film:
-                        film_ids.append(film.pk)
+                    if not all([title, year, uri]):
+                        continue
+                    try:
+                        film = Film.objects.get(letterboxd=uri)
+                    except Film.DoesNotExist:
+                        tmdb_id = scrape_letterboxd_for_tmdb_id(uri)
+                        if not tmdb_id:
+                            print(f"Skipping {title} ({year}) - tmdb_id not found in letterboxd page")
+                        film = Film.objects.create(title=title, year=year, letterboxd=uri, tmdb_id=tmdb_id)
+                        enrich_film_details(film)
+                    film_ids.append(film.pk)
                 if "watched" in request.FILES.get("csv_file").name:
                     user_watched, _ = UserWatched.objects.get_or_create(user=user)
                     user_watched.films.set(film_ids)
