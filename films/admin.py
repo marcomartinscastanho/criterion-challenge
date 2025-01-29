@@ -112,7 +112,7 @@ class FilmAdmin(admin.ModelAdmin):
     @admin.action(description="Get TMDB data")
     def get_tmdb_data(self, request: HttpRequest, queryset: QuerySet[Film]) -> None:
         for film in queryset:
-            enrich_film_details(film)
+            get_film_data(film)
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
