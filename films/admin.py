@@ -119,5 +119,10 @@ class FilmAdmin(admin.ModelAdmin):
         get_film_data(form.instance)
 
 
+class FilmSessionAdmin(admin.ModelAdmin):
+    list_display = ["id", "film", "venue", "datetime"]
+    list_filter = ["venue"]
+
+
 admin.site.register(Film, FilmAdmin)
-admin.site.register(FilmSession)
+admin.site.register(FilmSession, FilmSessionAdmin)

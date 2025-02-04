@@ -127,7 +127,6 @@ def enrich_film_details(film: Film):
     try:
         if film.tmdb_id:
             tmdb_data = get_movie_details(film.tmdb_id)
-            # FIXME: if not found? (e.g. TV shows...)
         else:
             tmdb_data = get_film(film.title, film.year)
             if not _is_this_the_correct_film(film, tmdb_data):
@@ -135,6 +134,8 @@ def enrich_film_details(film: Film):
             # save the tmdb_id
             if "tmdb_id" in tmdb_data and isinstance(tmdb_data["tmdb_id"], int):
                 Film.objects.filter(pk=film.pk).update(tmdb_id=tmdb_data["tmdb_id"])
+        # TODO: if tmdb_data, should raise an exception not catched in this function
+        # TODO: so that we can delete this movie outside of the function
         # from this point on, the film has tmdb_id
         if not film.directors.exists():
             _add_film_directors(film, tmdb_data)
@@ -175,7 +176,7 @@ def enrich_film_details(film: Film):
         if "runtime" in tmdb_data and isinstance(tmdb_data["runtime"], int):
             film.runtime = tmdb_data["runtime"]
             Film.objects.filter(pk=film.pk).update(runtime=tmdb_data["runtime"])
-    except Exception as e:
+    except Exception as e:  # FIXME: make the exception more specific
         print(f"ERROR: {film.pk}: {film.title} ({film.year}) - {e}")
 
 

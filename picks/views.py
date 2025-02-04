@@ -126,11 +126,13 @@ def suggestions(request: HttpRequest):
         # Skip categories without alternatives
         if not alternatives:
             continue
+        watchlisted_count = eligible_films.filter(pk__in=watchlisted_film_ids).count()
         # Find the current pick for the category
         picked = Pick.objects.filter(user=user, year=CURRENT_YEAR, category=category).first()
         suggested_changes.append(
             {
                 "category_number": category.number,
+                "watchlisted_count": watchlisted_count,
                 "category_title": category.title,
                 "pick": {
                     "id": picked.pk if picked else None,
@@ -145,4 +147,8 @@ def suggestions(request: HttpRequest):
             }
         )
 
-    return render(request, "suggestions.html", {"suggested_changes": suggested_changes})
+    return render(
+        request,
+        "suggestions.html",
+        {"suggested_changes": sorted(suggested_changes, key=lambda d: d["watchlisted_count"])},
+    )

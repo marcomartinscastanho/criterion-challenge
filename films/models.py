@@ -6,14 +6,6 @@ from django.db import models
 from common.models import Country, Genre, Keyword, Venue
 from directors.models import Director
 
-# TODO: custom queryset that creates filters for QuerySet[Film] such as:
-# https://stackoverflow.com/a/29798508/1971089
-#   - has_tmdb_data = has directors and has country and has genres and has runtime
-#   - has_letterboxd = has letterboxd url
-#   - is_ready = has_tmdb_data and has_letterboxd
-#   - is_criterion = has cc_id
-#   - is_feature = runtime >= 40
-
 
 class Film(models.Model):
     title = models.CharField(max_length=200)
@@ -32,9 +24,7 @@ class Film(models.Model):
         ordering = ["title"]
 
     def __str__(self):
-        return self.title
-
-    # TODO: on save(), if not self.tmdb_id -> get tmdb data
+        return f"{self.title} ({self.year})"
 
 
 class FilmSession(models.Model):
@@ -45,6 +35,7 @@ class FilmSession(models.Model):
     class Meta:
         verbose_name = "Session"
         ordering = ["datetime"]
+        unique_together = ("film", "venue", "datetime")
 
     def __str__(self):
         return f"{self.datetime.strftime('%d/%m/%Y at %H:%M')}: {self.film}, at {self.venue}"
