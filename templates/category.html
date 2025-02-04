@@ -2,8 +2,26 @@
 {% block content %}
   <h5>Category {{ category.number }}</h5>
   <h1>{{ category.title }}</h1>
+  {% if pick %}
+    <section class="mb-4">
+      <h2>Your Pick</h2>
+      <a class="btn btn-lg btn-primary  {% if pick.watchlisted %}text-warning{% endif %}"
+         href="{{ pick.url }}"
+         target="_blank"
+         rel="noopener noreferrer"
+         title="{% if pick.watchlisted %}Watchlisted{% endif %}">{{ pick.film }}
+        {% if pick.is_locked %}🔒{% endif %}
+      </a>
+    </section>
+    {% if not pick.is_locked %}
+      <section class="mb-4">
+        <h2>Other options with sessions</h2>
+        {% include "alternatives.html" %}
+      </section>
+    {% endif %}
+  {% endif %}
   <h2>All Films</h2>
-  <div class="d-flex justify-content-center flex-wrap mb-4">
+  <section class="d-flex justify-content-center flex-wrap mb-4">
     {% for film in category.films %}
       <a class="btn btn-lg btn-primary me-1 mb-1 {% if film.watched %}opacity-50{% endif %} {% if film.watchlisted %}text-warning{% endif %}"
          href="{{ film.url }}"
@@ -13,6 +31,6 @@
     {% empty %}
       <p>No films in this category.</p>
     {% endfor %}
-  </div>
+  </section>
   <a href="{% url 'categories' %}" class="btn btn-secondary">Back</a>
 {% endblock content %}
