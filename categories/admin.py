@@ -24,23 +24,11 @@ def get_m2m_sql_inserts(obj: Category, m2m_field_name: str) -> list[str]:
     return queries
 
 
-@admin.action(description="Generate SQL queries")
-def generate_sql_inserts(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet[Category]) -> None:
-    queries = []
-    for category in queryset.order_by("number"):
-        sql_query = get_object_sql_insert(category)
-        queries.append(sql_query)
-        m2m_queries = get_m2m_sql_inserts(category, "films")
-        queries.extend(m2m_queries)
-
-    joined_queries = "<br>".join(queries)
-    modeladmin.message_user(request, format_html(f"<pre>{joined_queries}</pre>"))
-
-
 class FilmsInline(admin.TabularInline):
     model = Film.categories.through
     extra = 0
     can_delete = False
+    verbose_name = "Film"
 
     def get_queryset(self, request):
         """
@@ -63,12 +51,24 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display_links = ["title"]
     search_fields = ["title"]
     filter_horizontal = ["films"]
-    actions = [generate_sql_inserts]
+    actions = ["generate_sql_inserts"]
     inlines = [FilmsInline]
 
     @admin.display(description="# Films")
     def num_films(self, obj: Category):
         return obj.num_films
+
+    @admin.action(description="Generate SQL queries")
+    def generate_sql_inserts(self, request: HttpRequest, queryset: QuerySet[Category]) -> None:
+        queries = []
+        for category in queryset.order_by("number"):
+            sql_query = get_object_sql_insert(category)
+            queries.append(sql_query)
+            m2m_queries = get_m2m_sql_inserts(category, "films")
+            queries.extend(m2m_queries)
+
+        joined_queries = "<br>".join(queries)
+        self.message_user(request, format_html(f"<pre>{joined_queries}</pre>"))
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)

@@ -3,8 +3,9 @@ from django.http import HttpRequest
 from django.shortcuts import get_object_or_404, render
 
 from categories.models import Category
-from categories.utils import get_category_films, len_or_warning
+from categories.utils import get_category_alternatives, get_category_films, len_or_warning
 from common.constants import CURRENT_YEAR
+from picks.models import Pick
 from users.models import UserWatched, UserWatchlist
 
 
@@ -15,7 +16,7 @@ def categories(request: HttpRequest):
     user_watchlist_qs = UserWatchlist.objects.filter(user=user).values("films")
     category_list = []
     for category in Category.objects.filter(year=CURRENT_YEAR).order_by("number"):
-        films = get_category_films(category, user, user_watched_qs, user_watchlist_qs)
+        films = get_category_films(category, user)
         user_watched_films = films.filter(pk__in=user_watched_qs)
         user_watchlist_films = films.filter(pk__in=user_watchlist_qs)
         category_list.append(
@@ -32,12 +33,13 @@ def categories(request: HttpRequest):
 
 
 @login_required
-def category_detail(request, category_id):
+def category_detail(request: HttpRequest, category_id: int):
     user = request.user
     category = get_object_or_404(Category, id=category_id)
     user_watched_qs = UserWatched.objects.filter(user=user).values("films")
     user_watchlist_qs = UserWatchlist.objects.filter(user=user).values("films")
-    films = get_category_films(category, user, user_watched_qs, user_watchlist_qs)
+    films = get_category_films(category, user)
+    pick = Pick.objects.filter(user=user, category=category).first()
     film_objects = [
         {
             "title": film.title,
@@ -48,8 +50,16 @@ def category_detail(request, category_id):
         }
         for film in films
     ]
-    return render(
-        request,
-        "category.html",
-        {"category": {"number": category.number, "title": category.title, "films": film_objects}},
-    )
+    response = {"category": {"number": category.number, "title": category.title, "films": film_objects}}
+    if pick:
+        response["pick"] = {
+            "id": pick.pk,
+            "film": str(pick.film),
+            "url": pick.film.letterboxd,
+            "is_locked": pick.locked,
+            "watchlisted": user_watchlist_qs.filter(films=pick.film).exists(),
+        }
+    alternatives = get_category_alternatives(category=category, user=user)
+    if alternatives:
+        response["alternatives"] = alternatives
+    return render(request, "category.html", response)

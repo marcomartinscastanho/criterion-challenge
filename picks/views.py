@@ -1,16 +1,13 @@
 import json
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import redirect, render
-from django.utils.timezone import now
 from django.views.decorators.http import require_http_methods
 
-from categories.models import Category
 from categories.utils import get_category_films
 from common.constants import CURRENT_YEAR
-from films.models import Film, FilmSession
+from films.models import Film
 from picks.models import Pick
 from picks.utils import generate_picks
 from users.models import User, UserWatched, UserWatchlist
@@ -30,7 +27,7 @@ def picks(request: HttpRequest):
     for pick in picks_qs:
         category = pick.category
         # Use `get_category_films` to calculate eligible films for the category
-        all_category_films = get_category_films(category, user, watched_film_ids, watchlisted_film_ids)
+        all_category_films = get_category_films(category, user)
         films = []
         for film in all_category_films:
             film_id = film.pk
@@ -79,70 +76,3 @@ def update_pick(request: HttpRequest, pick_id: int):
         return JsonResponse({"success": True})
     except (Pick.DoesNotExist, Film.DoesNotExist):
         return JsonResponse({"success": False, "error": "Pick or Film not found"}, status=404)
-
-
-@login_required
-def suggestions(request: HttpRequest):
-    user: User = request.user
-    # Precompute user-specific data
-    watched_film_ids = UserWatched.objects.filter(user=user).values_list("films__pk", flat=True)
-    watchlisted_film_ids = UserWatchlist.objects.filter(user=user).values_list("films__pk", flat=True)
-    picked_film_ids = Pick.objects.filter(user=user, year=CURRENT_YEAR).values_list("film__pk", flat=True)
-    # Fetch categories for the current year
-    locked_category_ids = Pick.objects.filter(user=user, year=CURRENT_YEAR, locked=True).values_list(
-        "category__id", flat=True
-    )
-    categories = Category.objects.filter(year=CURRENT_YEAR).exclude(id__in=locked_category_ids)
-    # Prepare data for response
-    suggested_changes = []
-    for category in categories:
-        # Get films eligible for the category
-        category_films = get_category_films(category, user, watched_film_ids, watchlisted_film_ids)
-        # Filter out films already picked or watched
-        eligible_films = category_films.exclude(Q(pk__in=watched_film_ids) | Q(pk__in=picked_film_ids))
-        # Fetch future sessions for eligible films
-        film_sessions = (
-            FilmSession.objects.filter(film__in=eligible_films, datetime__gt=now())
-            .select_related("venue", "film")
-            .order_by("datetime")
-        )
-        # Group sessions by film
-        film_sessions_by_film = {}
-        for session in film_sessions:
-            if session.film.pk not in film_sessions_by_film:
-                film_sessions_by_film[session.film.pk] = {
-                    "film": {"id": session.film.pk, "title": session.film.title, "year": session.film.year},
-                    "sessions": [],
-                    "watchlisted": session.film.pk in watchlisted_film_ids,
-                }
-            film_sessions_by_film[session.film.pk]["sessions"].append(
-                {"venue": session.venue.name, "datetime": session.datetime}
-            )
-        # Build alternatives list
-        alternatives = [
-            {"film": data["film"], "watchlisted": data["watchlisted"], "sessions": data["sessions"]}
-            for data in film_sessions_by_film.values()
-        ]
-        # Skip categories without alternatives
-        if not alternatives:
-            continue
-        # Find the current pick for the category
-        picked = Pick.objects.filter(user=user, year=CURRENT_YEAR, category=category).first()
-        suggested_changes.append(
-            {
-                "category_number": category.number,
-                "category_title": category.title,
-                "pick": {
-                    "id": picked.pk if picked else None,
-                    "film": {
-                        "title": picked.film.title if picked else None,
-                        "year": picked.film.year if picked else None,
-                    }
-                    if picked
-                    else None,
-                },
-                "alternatives": alternatives,
-            }
-        )
-
-    return render(request, "suggestions.html", {"suggested_changes": suggested_changes})

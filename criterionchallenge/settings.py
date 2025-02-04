@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 DEBUG = os.getenv("DEBUG", None) == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "192.168.1.130"]
 
 
 # Application definition
@@ -149,6 +149,10 @@ JAZZMIN_SETTINGS = {
         "auth.user": "fas fa-user",
         "categories.Category": "fa-solid fa-list",
         "common.Country": "fa-solid fa-globe",
+        "common.Gender": "fa-solid fa-venus-mars",
+        "common.Genre": "fa-solid fa-masks-theater",
+        "common.Keyword": "fa-solid fa-tags",
+        "common.Region": "fa-solid fa-earth-africa",
         "common.Venue": "fa-solid fa-building",
         "directors.Director": "fa-solid fa-clapperboard",
         "films.Film": "fa-solid fa-film",
@@ -161,6 +165,9 @@ JAZZMIN_SETTINGS = {
 }
 
 CRITERION_CF_CLEARANCE = os.getenv("CRITERION_CF_CLEARANCE")
+TMDB_API_TOKEN = os.getenv("TMDB_API_TOKEN")
 
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 2048
