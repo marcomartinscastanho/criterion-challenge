@@ -1,4 +1,5 @@
 import csv
+import json
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest
@@ -9,6 +10,7 @@ from films.models import Film
 from films.utils import enrich_film_details
 from users.forms import ProfileForm
 from users.models import UserWatched, UserWatchlist
+from users.utils import get_watched_chart_data
 
 
 @login_required
@@ -60,4 +62,6 @@ def profile(request: HttpRequest):
             except Exception as e:
                 return render(request, "profile.html", {"form": form, "error": f"An error occurred: {e}"})
     form = ProfileForm(instance=user)
-    return render(request, "profile.html", {"form": form})
+    chart_data = get_watched_chart_data(user)
+    # in case of a GET
+    return render(request, "profile.html", {"form": form, "chart_data": json.dumps(chart_data)})

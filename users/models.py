@@ -4,8 +4,6 @@ from django.db import models
 from common.constants import CURRENT_YEAR
 from films.models import Film
 
-# TODO: remove the email from the profile frontend form
-
 
 class User(AbstractUser):
     date_of_birth = models.DateField(null=True, blank=True)

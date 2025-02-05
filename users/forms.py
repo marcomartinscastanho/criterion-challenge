@@ -6,11 +6,10 @@ from users.models import User
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "email", "date_of_birth"]
+        fields = ["first_name", "last_name", "date_of_birth"]
         widgets = {
             "first_name": forms.TextInput(attrs={"class": "form-control"}),
             "last_name": forms.TextInput(attrs={"class": "form-control"}),
-            "email": forms.EmailInput(attrs={"class": "form-control"}),
             "date_of_birth": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
         }
         help_texts = {

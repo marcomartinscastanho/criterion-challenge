@@ -1,38 +1,47 @@
-{% load film_extras %}
 {% load common_extras %}
-<h2>Film stats</h2>
-<p>Your stats allow us to make a better selection for your Criterion Challenge.</p>
-<div class="row">
-  <div class="col">
-    <h3>Films</h3>
-    {% if user.watched %}
-      <p>{{ user.watched.num_films }} of {% films_count %}</p>
-      <p>Last updated: {{ user.watched.updated_at }}</p>
-      {% if user.watched.updated_at|more_than_a_month_ago %}
-        <div class="alert alert-warning">You haven't updated your Watched list in a while.</div>
+<section class="mb-4">
+  <h2>Film stats</h2>
+  <p>Your stats allow us to make a better selection for your Criterion Challenge.</p>
+  <div class="row mb-4">
+    <div class="col">
+      <h3>Watched</h3>
+      {% if user.watched %}
+        <p class="lead">
+          {{ user.watched.num_films }}
+          {% if user.watchlist %}
+            <small>({{ user.watched.num_films|percent:user.watchlist.num_films|floatformat:0 }}% of your watchlist)</small>
+          {% endif %}
+        </p>
+        <small>Last updated: {{ user.watched.updated_at }}</small>
+        {% if user.watched.updated_at|more_than_a_month_ago %}
+          <div class="alert alert-warning">You haven't updated your Watched list in a while.</div>
+        {% endif %}
+      {% else %}
+        <div class="alert alert-warning">
+          We don't have your Watched films yet.
+          <br />
+          Use the form below to upload them.
+        </div>
       {% endif %}
-    {% else %}
-      <div class="alert alert-warning">
-        We don't have your Watched films yet.
-        <br />
-        Use the form below to upload them.
-      </div>
-    {% endif %}
-  </div>
-  <div class="col">
-    <h3>Watchlist</h3>
-    {% if user.watchlist %}
-      <p>{{ user.watchlist.num_films }} of {% films_count %}</p>
-      <p>Last updated: {{ user.watchlist.updated_at }}</p>
-      {% if user.watchlist.updated_at|more_than_a_month_ago %}
-        <div class="alert alert-warning">You haven't updated your Watchlist in a while.</div>
+    </div>
+    <div class="col">
+      <h3>Watchlist</h3>
+      {% if user.watchlist %}
+        <p class="lead">{{ user.watchlist.num_films }}</p>
+        <small>Last updated: {{ user.watchlist.updated_at }}</small>
+        {% if user.watchlist.updated_at|more_than_a_month_ago %}
+          <div class="alert alert-warning">You haven't updated your Watchlist in a while.</div>
+        {% endif %}
+      {% else %}
+        <div class="alert alert-warning">
+          We don't have your Watchlist stats yet.
+          <br />
+          Use the form below to upload them.
+        </div>
       {% endif %}
-    {% else %}
-      <div class="alert alert-warning">
-        We don't have your Watchlist stats yet.
-        <br />
-        Use the form below to upload them.
-      </div>
-    {% endif %}
+    </div>
   </div>
-</div>
+  {% if user.watched and user.watchlist %}
+    {% include "profile/decades_chart.html" %}
+  {% endif %}
+</section>
