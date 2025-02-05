@@ -16,3 +16,11 @@ def more_than_a_month_ago(value):
     now = timezone.now()
     delta = now - value
     return delta > timedelta(days=30)
+
+
+@register.filter
+def percent(value, arg):
+    try:
+        return 100 * float(value) / float(arg)
+    except (ValueError, ZeroDivisionError):
+        return 0
