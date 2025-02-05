@@ -1,14 +1,43 @@
-from django.db.models import Count, Q
+from django.db.models import Case, Count, IntegerField, Q, When
 
 from categories.models import Category
 from categories.utils import get_category_films
 from common.constants import CURRENT_YEAR
 from picks.models import Pick
 from users.models import User, UserWatched, UserWatchlist
+from users.utils import get_watched_chart_data
 
 
-class NoChoicesLeft(Exception):
-    pass
+class DecadeWeights:
+    def __init__(self, user: User):
+        chart_data = get_watched_chart_data(user)
+        self.decade_map = {
+            int(decade): {
+                "watched": chart_data["bar_data_1"][i],
+                "watchlisted": chart_data["bar_data_2"][i],
+                "percentage": DecadeWeights._calc_percentage(chart_data["bar_data_1"][i], chart_data["bar_data_2"][i]),
+            }
+            for i, decade in enumerate(chart_data["decades"])
+        }
+
+    @staticmethod
+    def _calc_percentage(watched: int, watchlisted: int):
+        total = watched + watchlisted
+        return round(watched / total * 100, 1) if total > 0 else 0
+
+    def cases(self):
+        decade_percentage_map = {decade: data["percentage"] for decade, data in self.decade_map.items()}
+        cases = [
+            When(year__gte=decade, year__lt=decade + 10, then=percentage)
+            for decade, percentage in decade_percentage_map.items()
+        ]
+        return cases
+
+    def add_to_decade(self, decade: int):
+        decade_data = self.decade_map[decade]
+        decade_data["watched"] += 1
+        decade_data["percentage"] = DecadeWeights._calc_percentage(decade_data["watched"], decade_data["watchlisted"])
+        self.decade_map[decade] = decade_data
 
 
 def generate_picks(user: User):
@@ -18,21 +47,44 @@ def generate_picks(user: User):
     existing_picks = Pick.objects.filter(user=user, year=CURRENT_YEAR)
     picked_film_ids = set(existing_picks.values_list("film__pk", flat=True))
     picked_category_ids = set(existing_picks.values_list("category__pk", flat=True))
-    # Fetch all categories for the current year
-    categories = Category.objects.filter(year=CURRENT_YEAR)
+    # Fetch all categories for the current year, sorted by those with fewer films to most films
+    categories = list(Category.objects.filter(year=CURRENT_YEAR))
+    # Get films for each category
+    category_films_map = {category.pk: get_category_films(category=category, user=user) for category in categories}
+    # Compute number of films per category
+    category_film_counts = {category_id: films.count() for category_id, films in category_films_map.items()}
+    # Sort categories by film count (descending for more films first)
+    sorted_categories = sorted(categories, key=lambda c: category_film_counts.get(c.pk, 0))
+    # Define ordering with Case
+    order_cases = [When(pk=category.pk, then=pos) for pos, category in enumerate(sorted_categories)]
+    # Annotate and order categories by those with fewer films
+    categories = (
+        Category.objects.filter(pk__in=category_film_counts.keys())
+        .annotate(sort_order=Case(*order_cases, output_field=IntegerField()))
+        .order_by("sort_order")
+    )
+    # get decade data
+    decade_weights = DecadeWeights(user)
     # Iterate through categories and create picks
     for category in categories:
-        if category.id in picked_category_ids:
+        if category.pk in picked_category_ids:
             continue
         # Get eligible films for the category
-        all_category_films = get_category_films(category=category, user=user)
+        all_category_films = category_films_map[category.pk]
         # Randomize and prioritize watchlisted films
         all_category_films = (
             all_category_films.exclude(pk__in=user_watched_ids)
             .annotate(is_watchlisted=Count("pk", filter=Q(pk__in=user_watchlist_ids)))
-            .order_by("-is_watchlisted", "?")
+            .annotate(
+                decade_watched_percentage=Case(*(decade_weights.cases()), default=100, output_field=IntegerField())
+            )
+            .order_by("-is_watchlisted", "decade_watched_percentage", "?")
+            # TODO: also prioritize films who have sessions in the near future
+            # TODO: make that optional
+            # TODO: make the decade sorting optional as well
         )
         film = next((film for film in all_category_films if film.pk not in picked_film_ids), None)
         if film:
             Pick.objects.create(user=user, year=CURRENT_YEAR, category=category, film=film)
             picked_film_ids.add(film.pk)
+            decade_weights.add_to_decade(10 * (film.year // 10))
