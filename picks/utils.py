@@ -1,11 +1,15 @@
-from django.db.models import Case, Count, IntegerField, Q, When
+from django.db.models import Case, Count, IntegerField, Q, QuerySet, When
 
 from categories.models import Category
 from categories.utils import get_category_films
 from common.constants import CURRENT_YEAR
+from films.models import Film
 from picks.models import Pick
 from users.models import User, UserWatched, UserWatchlist
 from users.utils import get_watched_chart_data
+
+# TODO: make this a user property/field
+ENABLE_DECADE_SORTING = True
 
 
 class DecadeWeights:
@@ -40,17 +44,7 @@ class DecadeWeights:
         self.decade_map[decade] = decade_data
 
 
-def generate_picks(user: User):
-    user_watched_ids = UserWatched.objects.filter(user=user).values_list("films__pk", flat=True)
-    user_watchlist_ids = UserWatchlist.objects.filter(user=user).values_list("films__pk", flat=True)
-    # Fetch existing picks to avoid duplicates
-    existing_picks = Pick.objects.filter(user=user, year=CURRENT_YEAR)
-    picked_film_ids = set(existing_picks.values_list("film__pk", flat=True))
-    picked_category_ids = set(existing_picks.values_list("category__pk", flat=True))
-    # Fetch all categories for the current year, sorted by those with fewer films to most films
-    categories = list(Category.objects.filter(year=CURRENT_YEAR))
-    # Get films for each category
-    category_films_map = {category.pk: get_category_films(category=category, user=user) for category in categories}
+def _sort_categories(categories: list[Category], category_films_map: dict[int, QuerySet[Film]]):
     # Compute number of films per category
     category_film_counts = {category_id: films.count() for category_id, films in category_films_map.items()}
     # Sort categories by film count (descending for more films first)
@@ -63,25 +57,50 @@ def generate_picks(user: User):
         .annotate(sort_order=Case(*order_cases, output_field=IntegerField()))
         .order_by("sort_order")
     )
-    # get decade data
+    return categories
+
+
+def _get_order_by():
+    order_by_criteria = ["-is_watchlisted", "?"]
+    if ENABLE_DECADE_SORTING:
+        order_by_criteria.insert(1, "decade_watched_percentage")
+    return order_by_criteria
+
+
+def generate_picks(user: User):
+    user_watched_ids = UserWatched.objects.filter(user=user).values_list("films__pk", flat=True)
+    user_watchlist_ids = UserWatchlist.objects.filter(user=user).values_list("films__pk", flat=True)
+    # Fetch existing picks to avoid duplicates
+    existing_picks = Pick.objects.filter(user=user, year=CURRENT_YEAR)
+    picked_film_ids = set(existing_picks.values_list("film__pk", flat=True))
+    picked_category_ids = set(existing_picks.values_list("category__pk", flat=True))
+    # Fetch all categories for the current year
+    categories = list(Category.objects.filter(year=CURRENT_YEAR))
+    # Get films for each category
+    category_films_map = {category.pk: get_category_films(category=category, user=user) for category in categories}
+    # Sort categories by those with fewer films first
+    categories = _sort_categories(categories, category_films_map)
+    # Initializer decade weights
     decade_weights = DecadeWeights(user)
+    # Set default order criteria
+    order_by_criteria = _get_order_by()
     # Iterate through categories and create picks
     for category in categories:
+        # Skip categories already picked
         if category.pk in picked_category_ids:
             continue
-        # Get eligible films for the category
+        # Get eligible films for this category
         all_category_films = category_films_map[category.pk]
-        # Randomize and prioritize watchlisted films
+        # Randomize and then prioritize watchlisted films
         all_category_films = (
             all_category_films.exclude(pk__in=user_watched_ids)
             .annotate(is_watchlisted=Count("pk", filter=Q(pk__in=user_watchlist_ids)))
             .annotate(
                 decade_watched_percentage=Case(*(decade_weights.cases()), default=100, output_field=IntegerField())
             )
-            .order_by("-is_watchlisted", "decade_watched_percentage", "?")
+            .order_by(*order_by_criteria)
             # TODO: also prioritize films who have sessions in the near future
             # TODO: make that optional
-            # TODO: make the decade sorting optional as well
         )
         film = next((film for film in all_category_films if film.pk not in picked_film_ids), None)
         if film:
