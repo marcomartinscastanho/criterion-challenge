@@ -1,15 +1,17 @@
-from django.db.models import Case, Count, IntegerField, Q, QuerySet, When
+from django.db.models import Case, Count, Exists, IntegerField, OuterRef, Q, QuerySet, When
+from django.utils.timezone import now
 
 from categories.models import Category
 from categories.utils import get_category_films
 from common.constants import CURRENT_YEAR
-from films.models import Film
+from films.models import Film, FilmSession
 from picks.models import Pick
 from users.models import User, UserWatched, UserWatchlist
 from users.utils import get_watched_chart_data
 
-# TODO: make this a user property/field
+# TODO: make these user properties/fields
 ENABLE_DECADE_SORTING = True
+ENABLE_SESSION_SORTING = True
 
 
 class DecadeWeights:
@@ -64,6 +66,8 @@ def _get_order_by():
     order_by_criteria = ["-is_watchlisted", "?"]
     if ENABLE_DECADE_SORTING:
         order_by_criteria.insert(1, "decade_watched_percentage")
+    if ENABLE_SESSION_SORTING:
+        order_by_criteria.insert(1, "-has_future_session")
     return order_by_criteria
 
 
@@ -98,6 +102,7 @@ def generate_picks(user: User):
             .annotate(
                 decade_watched_percentage=Case(*(decade_weights.cases()), default=100, output_field=IntegerField())
             )
+            .annotate(has_future_session=Exists(FilmSession.objects.filter(film=OuterRef("pk"), datetime__gt=now())))
             .order_by(*order_by_criteria)
             # TODO: also prioritize films who have sessions in the near future
             # TODO: make that optional
