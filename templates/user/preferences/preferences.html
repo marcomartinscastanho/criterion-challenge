@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+    {% load common_extras %}
+    <ul class="nav nav-tabs  mb-2">
+        <li class="nav-item">
+            <a class="nav-link" href={% url 'profile' %}>Profile</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href={% url 'stats' %}>Stats</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="#">Preferences</a>
+        </li>
+    </ul>
+    <div class="mb-4">
+        <h1>Preferences</h1>
+        {% include "./pick_criteria.html" %}
+        <hr class="mt-5" />
+    </div>
+{% endblock content %}

@@ -19,53 +19,64 @@ def profile(request: HttpRequest):
     user = request.user
     if request.method == "POST":
         form = ProfileForm(request.POST, instance=user)
-        if "csv_file" not in request.FILES:
-            if form.is_valid():
-                form.save()
-                return render(request, "profile.html", {"form": form, "success": "Profile updated successfully!"})
-            else:
-                return render(request, "profile.html", {"form": form, "error": "The uploaded file must be a CSV file."})
+        if form.is_valid():
+            form.save()
+            return render(
+                request, "user/profile/profile.html", {"form": form, "success": "Profile updated successfully!"}
+            )
         else:
-            csv_file = request.FILES["csv_file"]
-            if not csv_file.name.endswith(".csv"):
-                return render(request, "profile.html", {"form": form, "error": "The uploaded file must be a CSV file."})
-            try:
-                decoded_file = csv_file.read().decode("utf-8").splitlines()
-                reader = csv.DictReader(decoded_file)
-                film_ids = []
-                for row in reader:
-                    title = row["Name"]
-                    year = row["Year"]
-                    uri = row["Letterboxd URI"]
-                    if not all([title, year, uri]):
-                        continue
-                    try:
-                        film = Film.objects.get(letterboxd=uri)
-                    except Film.DoesNotExist:
-                        tmdb_id = scrape_letterboxd_for_tmdb_id(uri)
-                        if not tmdb_id:
-                            print(f"Skipping {title} ({year}) - tmdb_id not found in letterboxd page")
-                            continue
-                        film = Film.objects.create(title=title, year=year, letterboxd=uri, tmdb_id=tmdb_id)
-                        enrich_film_details(film)
-                    film_ids.append(film.pk)
-                if "watched" in request.FILES.get("csv_file").name:
-                    user_watched, _ = UserWatched.objects.get_or_create(user=user)
-                    user_watched.films.set(film_ids)
-                    user_watched.save()
-                    return render(request, "profile.html", {"form": form, "success": "Watched films updated!"})
-                elif "watchlist" in request.FILES.get("csv_file").name:
-                    user_watchlist, _ = UserWatchlist.objects.get_or_create(user=user)
-                    user_watchlist.films.set(film_ids)
-                    user_watchlist.save()
-                    return render(request, "profile.html", {"form": form, "success": "Watchlisted films updated!"})
-                return render(request, "profile.html", {"form": form, "error": "Invalid file format."})
-            except Exception as e:
-                return render(request, "profile.html", {"form": form, "error": f"An error occurred: {e}"})
+            return render(
+                request, "user/profile/profile.html", {"form": form, "error": "The uploaded file must be a CSV file."}
+            )
     form = ProfileForm(instance=user)
-    chart_data = get_watched_chart_data(user)
     # in case of a GET
-    return render(request, "profile.html", {"form": form, "chart_data": json.dumps(chart_data)})
+    return render(request, "user/profile/profile.html", {"form": form})
+
+
+@login_required
+def film_stats(request: HttpRequest):
+    user = request.user
+    if request.method == "POST":
+        csv_file = request.FILES["csv_file"]
+        if not csv_file.name.endswith(".csv"):
+            return render(request, "user/stats/stats.html", {"error": "The uploaded file must be a CSV file."})
+        try:
+            decoded_file = csv_file.read().decode("utf-8").splitlines()
+            reader = csv.DictReader(decoded_file)
+            film_ids = []
+            for row in reader:
+                title = row["Name"]
+                year = row["Year"]
+                uri = row["Letterboxd URI"]
+                if not all([title, year, uri]):
+                    continue
+                try:
+                    film = Film.objects.get(letterboxd=uri)
+                except Film.DoesNotExist:
+                    tmdb_id = scrape_letterboxd_for_tmdb_id(uri)
+                    if not tmdb_id:
+                        print(f"Skipping {title} ({year}) - tmdb_id not found in letterboxd page")
+                        continue
+                    film = Film.objects.create(title=title, year=year, letterboxd=uri, tmdb_id=tmdb_id)
+                    enrich_film_details(film)
+                film_ids.append(film.pk)
+            if "watched" in request.FILES.get("csv_file").name:
+                user_watched, _ = UserWatched.objects.get_or_create(user=user)
+                user_watched.films.set(film_ids)
+                user_watched.save()
+                return render(request, "user/stats/stats.html", {"success": "Watched films updated!"})
+            elif "watchlist" in request.FILES.get("csv_file").name:
+                user_watchlist, _ = UserWatchlist.objects.get_or_create(user=user)
+                user_watchlist.films.set(film_ids)
+                user_watchlist.save()
+                return render(request, "user/stats/stats.html", {"success": "Watchlisted films updated!"})
+            return render(request, "user/stats/stats.html", {"error": "Invalid file format."})
+        except Exception as e:
+            return render(request, "user/stats/stats.html", {"error": f"An error occurred: {e}"})
+    else:
+        # GET
+        chart_data = get_watched_chart_data(user)
+        return render(request, "user/stats/stats.html", {"chart_data": json.dumps(chart_data)})
 
 
 @login_required
@@ -78,3 +89,14 @@ def set_pick_order_criteria(request: HttpRequest):
     preferences.pick_order_criteria = criteria
     preferences.save()
     return JsonResponse({"success": True})
+
+
+@login_required
+def preferences(request: HttpRequest):
+    return render(request, "user/preferences/preferences.html")
+
+
+@login_required
+def test_view(request):
+    days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    return render(request, "test.html", {"days_of_week": days_of_week})
