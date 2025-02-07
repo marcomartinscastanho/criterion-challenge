@@ -2,6 +2,9 @@
 <section class="mb-4">
   <h2>Film stats</h2>
   <p>Your stats allow us to make a better selection for your Criterion Challenge.</p>
+  {% if user.watched and user.watchlist %}
+    {% include "profile/decades_chart.html" %}
+  {% endif %}
   <div class="row mb-4">
     <div class="col">
       <h3>Watched</h3>
@@ -41,7 +44,4 @@
       {% endif %}
     </div>
   </div>
-  {% if user.watched and user.watchlist %}
-    {% include "profile/decades_chart.html" %}
-  {% endif %}
 </section>

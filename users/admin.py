@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from users.models import User, UserWatched, UserWatchlist
+from users.models import User, UserPreference, UserWatched, UserWatchlist
 
 
 class UserAdmin(DefaultUserAdmin):
@@ -22,6 +22,11 @@ class UserStatsAdmin(admin.ModelAdmin):
         return obj.num_films
 
 
+class UserPreferenceAdmin(admin.ModelAdmin):
+    list_display = ["user", "pick_order_criteria"]
+
+
 admin.site.register(User, UserAdmin)
+admin.site.register(UserPreference, UserPreferenceAdmin)
 admin.site.register(UserWatched, UserStatsAdmin)
 admin.site.register(UserWatchlist, UserStatsAdmin)

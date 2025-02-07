@@ -2,14 +2,15 @@ import csv
 import json
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpRequest
+from django.http import HttpRequest, JsonResponse
 from django.shortcuts import render
+from django.views.decorators.http import require_http_methods
 
 from common.letterboxd import scrape_letterboxd_for_tmdb_id
 from films.models import Film
 from films.utils import enrich_film_details
 from users.forms import ProfileForm
-from users.models import UserWatched, UserWatchlist
+from users.models import UserPreference, UserWatched, UserWatchlist
 from users.utils import get_watched_chart_data
 
 
@@ -65,3 +66,15 @@ def profile(request: HttpRequest):
     chart_data = get_watched_chart_data(user)
     # in case of a GET
     return render(request, "profile.html", {"form": form, "chart_data": json.dumps(chart_data)})
+
+
+@login_required
+@require_http_methods(["PATCH"])
+def set_pick_order_criteria(request: HttpRequest):
+    user = request.user
+    data = json.loads(request.body)
+    criteria = data.get("criteria")
+    preferences, _ = UserPreference.objects.get_or_create(user=user)
+    preferences.pick_order_criteria = criteria
+    preferences.save()
+    return JsonResponse({"success": True})

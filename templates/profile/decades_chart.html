@@ -1,83 +1,85 @@
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<canvas id="watchedChart" class="p-2"></canvas>
-<script>
-  // Get the chart data from Django
-  let chartData = JSON.parse('{{ chart_data|escapejs }}');
+<section class="mb-4">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <canvas id="watchedChart"></canvas>
+    <script>
+        // Get the chart data from Django
+        let chartData = JSON.parse('{{ chart_data|escapejs }}');
 
-  // Extract data
-  let labels = chartData.decades;
-  let barData1 = chartData.bar_data_1;
-  let barData2 = chartData.bar_data_2;
-  let lineData = chartData.line_data;
-  // Function to round maxCount to the nearest "round" number divisible by 5
-  function roundMaxCount(value) {
-    return Math.ceil(value / 50) * 50;  // Round to nearest 50 (ensures divisibility by 5)
-  }
-  // Function to round maxPercentage to nearest multiple of 10 satisfying the condition
-  function roundMaxPercentage(value) {
-    return Math.ceil(value / 10) * 10;  // Round to nearest 10
-  }
-  // Find max values
-  let maxCount = Math.max(...barData1, ...barData2);  // Max watched or watchlisted
-  let maxPercentage = Math.max(...lineData);         // Max watched %
-  let roundedMaxCount = roundMaxCount(maxCount);
-  let roundedMaxPercentage = roundMaxPercentage(maxPercentage);
-  let numSteps = 5;  // Fixed number of grid lines
-  let stepSizeCount = roundedMaxCount / numSteps;
-  let stepSizePercentage = roundedMaxPercentage / numSteps;
-
-  // Create the chart
-  let ctx = document.getElementById('watchedChart').getContext('2d');
-  let myChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-          labels: labels,
-          datasets: [
-              {
-                  label: 'Watched Films',
-                  data: barData1,
-                  backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                  borderWidth: 1
-              },
-              {
-                  label: 'Watchlisted Films',
-                  data: barData2,
-                  backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                  borderWidth: 1
-              },
-              {
-                  label: 'Watched %',
-                  data: lineData,
-                  type: 'line',
-                  borderColor: 'rgba(75, 192, 192, 1)',
-                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                  borderWidth: 2,
-                  yAxisID: 'percentageScale',
-                  fill: false
-              }
-          ]
-      },
-      options: {
-        responsive: true,
-        scales: {
-            y: {
-                beginAtZero: true,
-                title: { display: true, text: 'Film Count' },
-                ticks: {
-                    stepSize: stepSizeCount  // Ensure step size is consistent
-                },
-                grid: { drawTicks: true }
-            },
-            percentageScale: {
-                position: 'right',
-                beginAtZero: true,
-                title: { display: true, text: 'Watched %' },
-                ticks: {
-                    stepSize: stepSizePercentage  // Synchronize with count axis
-                },
-                grid: { drawTicks: true }
-            }
+        // Extract data
+        let labels = chartData.decades;
+        let barData1 = chartData.bar_data_1;
+        let barData2 = chartData.bar_data_2;
+        let lineData = chartData.line_data;
+        // Function to round maxCount to the nearest "round" number divisible by 5
+        function roundMaxCount(value) {
+            return Math.ceil(value / 50) * 50;  // Round to nearest 50 (ensures divisibility by 5)
         }
-    }
-});
-</script>
+        // Function to round maxPercentage to nearest multiple of 10 satisfying the condition
+        function roundMaxPercentage(value) {
+            return Math.ceil(value / 10) * 10;  // Round to nearest 10
+        }
+        // Find max values
+        let maxCount = Math.max(...barData1, ...barData2);  // Max watched or watchlisted
+        let maxPercentage = Math.max(...lineData);         // Max watched %
+        let roundedMaxCount = roundMaxCount(maxCount);
+        let roundedMaxPercentage = roundMaxPercentage(maxPercentage);
+        let numSteps = 5;  // Fixed number of grid lines
+        let stepSizeCount = roundedMaxCount / numSteps;
+        let stepSizePercentage = roundedMaxPercentage / numSteps;
+
+        // Create the chart
+        let ctx = document.getElementById('watchedChart').getContext('2d');
+        let myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Watched Films',
+                        data: barData1,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Watchlisted Films',
+                        data: barData2,
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Watched %',
+                        data: lineData,
+                        type: 'line',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 2,
+                        yAxisID: 'percentageScale',
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Film Count' },
+                        ticks: {
+                            stepSize: stepSizeCount  // Ensure step size is consistent
+                        },
+                        grid: { drawTicks: true }
+                    },
+                    percentageScale: {
+                        position: 'right',
+                        beginAtZero: true,
+                        title: { display: true, text: 'Watched %' },
+                        ticks: {
+                            stepSize: stepSizePercentage  // Synchronize with count axis
+                        },
+                        grid: { drawTicks: true }
+                    }
+                }
+            }
+        });
+    </script>
+</section>

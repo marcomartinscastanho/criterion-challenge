@@ -1,20 +1,12 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
-from common.constants import CURRENT_YEAR
 from films.models import Film
 
 
 class User(AbstractUser):
     date_of_birth = models.DateField(null=True, blank=True)
-    # TODO: use_criterion: boolean (def True) (called strict mode in the frontend)
-
-    @property
-    def challenge_complete(self):
-        try:
-            return self.picks.filter(year=CURRENT_YEAR).count() == 52
-        except Exception:
-            return False
 
 
 class UserLists(models.Model):
@@ -43,3 +35,11 @@ class UserWatchlist(UserLists):
     class Meta:
         verbose_name = "User Watchlist"
         verbose_name_plural = "Watchlisted Films"
+
+
+class UserPreference(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="preferences")
+    pick_order_criteria = ArrayField(models.CharField(max_length=100), blank=True, default=list)
+
+    class Meta:
+        verbose_name = "User Preference"

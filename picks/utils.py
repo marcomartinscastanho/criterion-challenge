@@ -1,4 +1,4 @@
-from django.db.models import Case, Count, Exists, IntegerField, OuterRef, Q, QuerySet, When
+from django.db.models import BooleanField, Case, Count, Exists, IntegerField, OuterRef, Q, QuerySet, Value, When
 from django.utils.timezone import now
 
 from categories.models import Category
@@ -8,10 +8,6 @@ from films.models import Film, FilmSession
 from picks.models import Pick
 from users.models import User, UserWatched, UserWatchlist
 from users.utils import get_watched_chart_data
-
-# TODO: make these user properties/fields
-ENABLE_DECADE_SORTING = True
-ENABLE_SESSION_SORTING = True
 
 
 class DecadeWeights:
@@ -62,13 +58,12 @@ def _sort_categories(categories: list[Category], category_films_map: dict[int, Q
     return categories
 
 
-def _get_order_by():
-    order_by_criteria = ["-is_watchlisted", "?"]
-    if ENABLE_DECADE_SORTING:
-        order_by_criteria.insert(1, "decade_watched_percentage")
-    if ENABLE_SESSION_SORTING:
-        order_by_criteria.insert(1, "-has_future_session")
-    return order_by_criteria
+def _get_order_by(user: User):
+    try:
+        order_by_criteria: list[str] = user.preferences.pick_order_criteria
+    except Exception:
+        order_by_criteria: list[str] = []
+    return order_by_criteria + ["?"]
 
 
 def generate_picks(user: User):
@@ -87,7 +82,7 @@ def generate_picks(user: User):
     # Initializer decade weights
     decade_weights = DecadeWeights(user)
     # Set default order criteria
-    order_by_criteria = _get_order_by()
+    order_by_criteria = _get_order_by(user)
     # Iterate through categories and create picks
     for category in categories:
         # Skip categories already picked
@@ -103,9 +98,12 @@ def generate_picks(user: User):
                 decade_watched_percentage=Case(*(decade_weights.cases()), default=100, output_field=IntegerField())
             )
             .annotate(has_future_session=Exists(FilmSession.objects.filter(film=OuterRef("pk"), datetime__gt=now())))
+            .annotate(
+                has_cc_id=Case(
+                    When(cc_id__isnull=False, then=Value(True)), default=Value(False), output_field=BooleanField()
+                )
+            )
             .order_by(*order_by_criteria)
-            # TODO: also prioritize films who have sessions in the near future
-            # TODO: make that optional
         )
         film = next((film for film in all_category_films if film.pk not in picked_film_ids), None)
         if film:
