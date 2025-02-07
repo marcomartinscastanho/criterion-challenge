@@ -3,11 +3,12 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import redirect, render
+from django.utils.timezone import now
 from django.views.decorators.http import require_http_methods
 
 from categories.utils import get_category_films
 from common.constants import CURRENT_YEAR
-from films.models import Film
+from films.models import Film, FilmSession
 from picks.models import Pick
 from picks.utils import generate_picks
 from users.models import User, UserWatched, UserWatchlist
@@ -19,6 +20,7 @@ def picks(request: HttpRequest):
     # Precompute watched and watchlisted films as sets for quick lookups
     watched_film_ids = UserWatched.objects.filter(user=user).values_list("films__pk", flat=True)
     watchlisted_film_ids = UserWatchlist.objects.filter(user=user).values_list("films__pk", flat=True)
+    sessions_soon_film_ids = FilmSession.objects.filter(datetime__gt=now()).values_list("film__pk", flat=True)
     # Fetch all picks for the user in the current year
     picks_qs = Pick.objects.select_related("category", "film").filter(user=user, year=CURRENT_YEAR)
     # Collect all films picked by the user in the current year (for `is_picked` checks)
@@ -38,6 +40,7 @@ def picks(request: HttpRequest):
                     "year": film.year,
                     "disabled": (film_id in picked_film_ids) or (film_id in watched_film_ids),
                     "watchlisted": film_id in watchlisted_film_ids,
+                    "session_soon": film_id in sessions_soon_film_ids,
                 }
             )
         picks.append(
