@@ -167,6 +167,7 @@ JAZZMIN_SETTINGS = {
         "films.FilmSession": "fa-solid fa-bars-staggered",
         "picks.Pick": "fa-solid fa-check",
         "users.User": "fa-solid fa-user",
+        "users.UserPreference": "fa-solid fa-sliders",
         "users.UserWatchlist": "fa-regular fa-square",
         "users.UserWatched": "fa-solid fa-square-check",
     },

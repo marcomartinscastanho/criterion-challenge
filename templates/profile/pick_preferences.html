@@ -1,0 +1,94 @@
+<section class="mb-5">
+    <script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script>
+    <style>
+        .options-list-container {
+            min-height: 50px;
+            min-width: 300px;
+            border-radius: .375rem;
+            padding: 5px;
+            background-color: #dee2e6;
+        }
+        .dropzone {
+            min-height: 54px;
+            border: 1px solid #dee2e6;
+            padding: 5px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            min-width: 300px;
+            background-color: white;
+            border-radius: .375rem;
+            gap: 5px;
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+        }
+        .draggable {
+            cursor: grab;
+            margin: 2px;
+            display: inline-block;
+            white-space: nowrap;
+            user-select: none;
+        }
+    </style>
+    <h3 class="mb-3">How should we prioritize picks for you?</h3>
+    <p>
+        We'll use these criteria when we choosing your picks.
+        <br>
+        Arrange the badges in order of relevance for you (most important first).
+        <br>
+        <small>
+            Recommended: "In My Watchlist" first.
+            Leave out criteria you don't care about.
+        </small>
+    </p>
+    <!-- Dropzone -->
+    <div id="dropzone" class="dropzone flex flex-row mb-3"></div>
+    <!-- Draggable Elements -->
+    <div class="options-list-container">
+        <div id="optionsList" class="flex flex-row">
+            <span class="draggable btn btn-light" data-id="-is_watchlisted">In My Watchlist</span>
+            <span class="draggable btn btn-light" data-id="-has_cc_id">In Criterion Collection</span>
+            <span class="draggable btn btn-light" data-id="decade_watched_percentage">Least Watched Decades</span>
+            <span class="draggable btn btn-light" data-id="-has_future_session">With Sessions Soon</span>
+            <span class="draggable btn btn-light" data-id="year">Earliest</span>
+            <span class="draggable btn btn-light" data-id="-year">Newest</span>
+            <span class="draggable btn btn-light" data-id="runtime">Shortest</span>
+            <span class="draggable btn btn-light" data-id="-runtime">Longest</span>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Get user's selected criteria from Django template
+            const selectedCriteria = {{ user.preferences.pick_order_criteria|safe }};    
+            // Move selected options to the dropzone
+            selectedCriteria.forEach(criteria => {
+                const element = document.querySelector(`[data-id="${criteria}"]`);
+                if (element) {
+                    document.getElementById("dropzone").appendChild(element);
+                }
+            });
+        });
+       // dropzone
+        Sortable.create(dropzone,{
+            group: 'shared',
+            animation: 150,
+            store: {
+                set: function (sortable) {
+                    var order = sortable.toArray();
+                    fetch("/user/preferences/pick-criteria/update/", {
+                        method: "PATCH",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": "{{ csrf_token }}",
+                        },
+                        body: JSON.stringify({ criteria: order }),
+                        })
+                }
+            }
+        });
+        // optionsList
+        Sortable.create(optionsList, {
+            group: 'shared',
+            animation: 150,
+        })
+    </script>
+</section>
