@@ -26,7 +26,8 @@
                         {% if film.disabled %}disabled{% endif %}
                         {% if pick.film.id == film.id %}selected{% endif %}>
                   {{ film.title }} ({{ film.year }})
-                  {% if film.watchlisted %}*{% endif %}
+                  {% if film.watchlisted %}(W){% endif %}
+                  {% if film.session_soon %}(S){% endif %}
                 </option>
               {% endfor %}
             </select>
@@ -49,7 +50,8 @@
       {% endfor %}
     </tbody>
   </table>
-  <small>* in your watchlist</small>
+  <small>(W) in your watchlist</small>
+  <small>(S) has a session soon</small>
   <div class="my-2 d-flex gap-2">
     <div>
       <a href="{% url 'complete_picks' %}" class="btn btn-primary">Randomize Picks</a>
