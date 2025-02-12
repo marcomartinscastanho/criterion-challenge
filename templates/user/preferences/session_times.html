@@ -1,0 +1,95 @@
+<section class="mb-5">
+    <link rel="stylesheet"
+          href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+    <script>
+        $(document).ready( function() {
+            const userSessionTimePref = {{ user.preferences.session_times|safe }};    
+          $( ".hour-slider" ).each(function () {
+            let sliderId = $(this).attr("id").split("-")[1];
+            let start = userSessionTimePref[sliderId]?.start ?? 0;
+            let end = userSessionTimePref[sliderId]?.end ?? 24;
+            $("#" + $(this).attr("id")).slider({
+            range: true,
+            min: 0,
+            max: 24,
+            values: [start, end],
+            slide: function( event, ui ) {
+              $( "#start-value-"+sliderId ).text(  ui.values[ 0 ] );
+              $( "#end-value-"+sliderId ).text(  ui.values[ 1 ] );
+            }
+          });
+        });
+
+        $(".start-value").each(function () {
+            let valueId = $(this).attr("id").split("-")[1];
+            $("#" + $(this).attr("id")).text( $( ".hour-slider" ).slider( "values", 0 ));
+          });
+
+          $(".end-value").each(function () {
+            let valueId = $(this).attr("id").split("-")[1];
+            $("#" + $(this).attr("id")).text( $( ".hour-slider" ).slider( "values", 1 ));
+          });
+
+          $("#session-times-form").submit(function (e) {
+            e.preventDefault();
+            let preferences = {};
+            $(".hour-slider").each(function () {
+                let sliderId = $(this).attr("id").split("-")[1];
+                let start = parseInt($("#start-value-" + sliderId).text());
+                let end = parseInt($("#end-value-" + sliderId).text());
+
+                if (start !== 0 || end !== 24) {
+                    preferences[sliderId] = { start, end };
+                }
+            });
+            console.log("Saved Preferences:", preferences);
+            fetch("/user/preferences/session-times/update/", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify( preferences )
+                })
+        });
+    });
+    </script>
+    <h3 class="mb-3">When do you go to the cinema?</h3>
+    <p>
+        We'll suggest films with sessions within your schedule.
+        <br>
+        <small>Consider only the starting time of the session, not the end time.</small>
+    </p>
+    <form id="session-times-form">
+        <table class="table mb-0 align-middle mb-2">
+            <thead class="rounded-top">
+                <tr>
+                    <th>Day</th>
+                    <th></th>
+                    <th class="w-50">Hours</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for day_int, day_str in days_of_week.items %}
+                    <tr>
+                        <td>{{ day_str }}</td>
+                        <td>
+                            <span class="d-inline text-nowrap">
+                                <span id="start-value-{{ day_int }}" class="start-value" readonly></span>
+                                h -
+                                <span id="end-value-{{ day_int }}" class="end-value" readonly></span>
+                                h
+                            </span>
+                        </td>
+                        <td>
+                            <div id="slider-{{ day_int }}"  class="hour-slider"></div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">Save Preferences</button>
+    </form>
+</section>

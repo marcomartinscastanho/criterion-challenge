@@ -97,7 +97,13 @@ def generate_picks(user: User):
             .annotate(
                 decade_watched_percentage=Case(*(decade_weights.cases()), default=100, output_field=IntegerField())
             )
-            .annotate(has_future_session=Exists(FilmSession.objects.filter(film=OuterRef("pk"), datetime__gt=now())))
+            .annotate(
+                has_future_session=Exists(
+                    FilmSession.objects.filter_by_datetime_preference(user).filter(
+                        film=OuterRef("pk"), datetime__gt=now()
+                    )
+                )
+            )
             .annotate(
                 has_cc_id=Case(
                     When(cc_id__isnull=False, then=Value(True)), default=Value(False), output_field=BooleanField()
