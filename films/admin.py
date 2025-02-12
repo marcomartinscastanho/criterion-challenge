@@ -46,6 +46,7 @@ def get_film_data(film: Film):
             # nothing else we can do here
             return
         film.tmdb_id = tmdb_id
+        Film.objects.filter(pk=film.pk).update(tmdb_id=tmdb_id)
     # if we got here, there is tmdb_id
     if not all(
         [
