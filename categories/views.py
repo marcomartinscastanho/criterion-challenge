@@ -8,7 +8,7 @@ from categories.utils import get_category_films, len_or_warning
 from common.constants import CURRENT_YEAR
 from films.models import FilmSession
 from picks.models import Pick
-from users.models import UserWatched, UserWatchlist
+from users.models import UserPreference, UserWatched, UserWatchlist
 
 
 @login_required
@@ -67,11 +67,17 @@ def categories(request: HttpRequest):
 def category_detail(request: HttpRequest, category_id: int):
     user = request.user
     category = get_object_or_404(Category, id=category_id)
-    user_watched_qs = UserWatched.objects.filter(user=user).values("films")
-    user_watchlist_qs = UserWatchlist.objects.filter(user=user).values("films")
+    preferences, _ = UserPreference.objects.get_or_create(user=user)
+    # Fetch films
     films = get_category_films(category, user)
-    pick = Pick.objects.filter(user=user, category=category).first()
-    user_picks = Pick.objects.filter(user=user, year=CURRENT_YEAR).values("film")
+    # Apply filters
+    if preferences.filter_not_watched:
+        films = [film for film in films if not UserWatched.objects.filter(user=user, films=film).exists()]
+    if preferences.filter_watchlisted:
+        films = [film for film in films if UserWatchlist.objects.filter(user=user, films=film).exists()]
+    if preferences.filter_with_sessions:
+        films = [film for film in films if FilmSession.objects.filter(film=film, datetime__gt=now()).exists()]
+    # Prepare response
     film_objects = [
         {
             "id": film.pk,
@@ -79,17 +85,18 @@ def category_detail(request: HttpRequest, category_id: int):
             "year": film.year,
             "directors": ", ".join(map(str, film.directors.all())),
             "url": film.letterboxd,
-            "watched": user_watched_qs.filter(films=film).exists(),
-            "watchlisted": user_watchlist_qs.filter(films=film).exists(),
-            "is_pick": pick is not None and film.pk == pick.film.pk,
-            "picked": user_picks.filter(film=film).exists(),
+            "watched": UserWatched.objects.filter(user=user, films=film).exists(),
+            "watchlisted": UserWatchlist.objects.filter(user=user, films=film).exists(),
+            "is_pick": Pick.objects.filter(user=user, category=category, film=film).exists(),
+            "picked": Pick.objects.filter(user=user, year=CURRENT_YEAR, film=film).exists(),
             "sessions": [
-                {"venue": session.venue, "date": session.datetime}
-                for session in FilmSession.objects.filter(film=film, datetime__gt=now())
+                {"venue": s.venue, "date": s.datetime}
+                for s in FilmSession.objects.filter(film=film, datetime__gt=now())
             ],
         }
         for film in films
     ]
+    pick = Pick.objects.filter(user=user, category=category).first()
     response = {
         "category": {
             "id": category.pk,
@@ -97,6 +104,11 @@ def category_detail(request: HttpRequest, category_id: int):
             "title": category.title,
             "films": film_objects,
             "locked": pick.locked if pick else False,
-        }
+        },
+        "filters": {
+            "filter_not_watched": preferences.filter_not_watched,
+            "filter_watchlisted": preferences.filter_watchlisted,
+            "filter_with_sessions": preferences.filter_with_sessions,
+        },
     }
     return render(request, "category.html", response)

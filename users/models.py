@@ -46,6 +46,9 @@ class UserPreference(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="preferences")
     pick_order_criteria = ArrayField(models.CharField(max_length=100), blank=True, default=list)
     session_times = models.JSONField(default=dict, blank=True)
+    filter_not_watched = models.BooleanField(default=False)
+    filter_watchlisted = models.BooleanField(default=False)
+    filter_with_sessions = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "User Preference"

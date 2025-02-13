@@ -5,6 +5,30 @@
     {{ category.title }}
     {% if category.locked %}🔒{% endif %}
   </h1>
+  <!-- Filters -->
+  <div class="btn-group mb-3" role="group" aria-label="Film filters">
+    <input type="checkbox"
+           class="btn-check"
+           id="filter-not-watched"
+           autocomplete="off"
+           {% if filters.filter_not_watched %}checked{% endif %}
+           onchange="toggleFilters({'filter_not_watched': {{ filters.filter_not_watched|yesno:"false,true" }} })">
+    <label class="btn btn-primary" for="filter-not-watched">Not Watched</label>
+    <input type="checkbox"
+           class="btn-check"
+           id="filter-watchlisted"
+           autocomplete="off"
+           {% if filters.filter_watchlisted %}checked{% endif %}
+           onchange="toggleFilters({'filter_watchlisted': {{ filters.filter_watchlisted|yesno:"false,true" }} })">
+    <label class="btn btn-primary" for="filter-watchlisted">Watchlisted</label>
+    <input type="checkbox"
+           class="btn-check"
+           id="filter-with-sessions"
+           autocomplete="off"
+           {% if filters.filter_with_sessions %}checked{% endif %}
+           onchange="toggleFilters({'filter_with_sessions': {{ filters.filter_with_sessions|yesno:"false,true" }} })">
+    <label class="btn btn-primary" for="filter-with-sessions">With Sessions</label>
+  </div>
   <section class="row row-cols-1 row-cols-md-4 g-2 mb-4">
     {% for film in category.films %}
       <div class="col">
@@ -99,6 +123,30 @@
           console.error(error);
           alert("Failed to update lock status.");
       });
-  }
+    }
+
+    function toggleFilters(filters) {
+      fetch(`/user/preferences/filters/update/`, {
+      method: "PATCH",
+      headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}",
+      },
+      body: JSON.stringify(filters),
+      })
+      .then((response) => {
+          if (response.ok) {
+              return response.json();
+          }
+          throw new Error("Failed to update lock status");
+      })
+      .then((data) => {
+        window.location.reload();
+      })
+      .catch((error) => {
+          console.error(error);
+          alert("Failed to update lock status.");
+      });
+    }
   </script>
 {% endblock content %}

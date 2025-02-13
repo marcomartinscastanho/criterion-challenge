@@ -109,3 +109,21 @@ def update_time_preferences(request: HttpRequest):
 def preferences(request: HttpRequest):
     days_of_week = {1: "Monday", 2: "Tuesday", 3: "Wednesday", 4: "Thursday", 5: "Friday", 6: "Saturday", 7: "Sunday"}
     return render(request, "user/preferences/preferences.html", {"days_of_week": days_of_week})
+
+
+@login_required
+@require_http_methods(["PATCH"])
+def update_filter_preferences(request: HttpRequest):
+    user = request.user
+    data = json.loads(request.body)
+    filter_not_watched = data.get("filter_not_watched")
+    filter_watchlisted = data.get("filter_watchlisted")
+    filter_with_sessions = data.get("filter_with_sessions")
+    UserPreference.objects.get_or_create(user=user)
+    if filter_not_watched is not None:
+        UserPreference.objects.filter(user=user).update(filter_not_watched=filter_not_watched)
+    if filter_watchlisted is not None:
+        UserPreference.objects.filter(user=user).update(filter_watchlisted=filter_watchlisted)
+    if filter_with_sessions is not None:
+        UserPreference.objects.filter(user=user).update(filter_with_sessions=filter_with_sessions)
+    return JsonResponse({"success": True})
