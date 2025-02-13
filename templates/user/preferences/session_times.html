@@ -16,20 +16,22 @@
             max: 24,
             values: [start, end],
             slide: function( event, ui ) {
-              $( "#start-value-"+sliderId ).text(  ui.values[ 0 ] );
-              $( "#end-value-"+sliderId ).text(  ui.values[ 1 ] );
+              $( "#startvalue-"+sliderId ).text(  ui.values[ 0 ] );
+              $( "#endvalue-"+sliderId ).text(  ui.values[ 1 ] );
             }
           });
         });
 
-        $(".start-value").each(function () {
+        $(".startvalue").each(function () {
             let valueId = $(this).attr("id").split("-")[1];
-            $("#" + $(this).attr("id")).text( $( ".hour-slider" ).slider( "values", 0 ));
+            let start = userSessionTimePref[valueId]?.start ?? 0;
+            $("#" + $(this).attr("id")).text(start);
           });
 
-          $(".end-value").each(function () {
+          $(".endvalue").each(function () {
             let valueId = $(this).attr("id").split("-")[1];
-            $("#" + $(this).attr("id")).text( $( ".hour-slider" ).slider( "values", 1 ));
+            let end = userSessionTimePref[valueId]?.end ?? 0;
+            $("#" + $(this).attr("id")).text(end);  
           });
 
           $("#session-times-form").submit(function (e) {
@@ -37,8 +39,8 @@
             let preferences = {};
             $(".hour-slider").each(function () {
                 let sliderId = $(this).attr("id").split("-")[1];
-                let start = parseInt($("#start-value-" + sliderId).text());
-                let end = parseInt($("#end-value-" + sliderId).text());
+                let start = parseInt($("#startvalue-" + sliderId).text());
+                let end = parseInt($("#endvalue-" + sliderId).text());
 
                 if (start !== 0 || end !== 24) {
                     preferences[sliderId] = { start, end };
@@ -77,9 +79,9 @@
                         <td>{{ day_str }}</td>
                         <td>
                             <span class="d-inline text-nowrap">
-                                <span id="start-value-{{ day_int }}" class="start-value" readonly></span>
+                                <span id="startvalue-{{ day_int }}" class="startvalue" readonly></span>
                                 h -
-                                <span id="end-value-{{ day_int }}" class="end-value" readonly></span>
+                                <span id="endvalue-{{ day_int }}" class="endvalue" readonly></span>
                                 h
                             </span>
                         </td>

@@ -9,8 +9,9 @@ class User(AbstractUser):
     date_of_birth = models.DateField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
+        r = super().save(*args, **kwargs)
         UserPreference.objects.get_or_create(user=self)
-        return super().save(*args, **kwargs)
+        return r
 
 
 class UserLists(models.Model):

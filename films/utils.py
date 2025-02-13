@@ -234,13 +234,15 @@ def resolve_user_attribute(user: User, attribute: str):
             if att == "date_of_birth":
                 value = value.date_of_birth.year
             elif att == "watched":
-                value = value.watched
+                if (value := getattr(value, "watched", None)) is None:
+                    return []
             elif att == "watchlist":
-                value = value.watchlist
+                if (value := getattr(value, "watchlist", None)) is None:
+                    return []
             elif att == "films":
-                value = value.films.all()
+                value = value.films.all() or []
             elif att == "directors":
-                value = Director.objects.filter(films__in=value).distinct()
+                value = Director.objects.filter(films__in=value).distinct() or []
     except Exception:
         return None
     return value
