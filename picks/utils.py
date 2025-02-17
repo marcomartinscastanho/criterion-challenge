@@ -1,4 +1,4 @@
-from django.db.models import BooleanField, Case, Count, Exists, IntegerField, OuterRef, Q, QuerySet, Value, When
+from django.db.models import BooleanField, Case, Exists, IntegerField, OuterRef, QuerySet, Value, When
 from django.utils.timezone import now
 
 from categories.models import Category
@@ -21,6 +21,12 @@ class DecadeWeights:
             }
             for i, decade in enumerate(chart_data["decades"])
         }
+        # add locked picks not yet watched to the decade weights
+        user_watched_ids = UserWatched.objects.filter(user=user).values_list("films__pk", flat=True)
+        locked_picks = Pick.objects.filter(user=user, year=CURRENT_YEAR, locked=True)
+        for locked_pick in locked_picks:
+            if locked_pick.film.pk not in user_watched_ids:
+                self.add_to_decade(locked_pick.film.decade)
 
     @staticmethod
     def _calc_percentage(watched: int, watchlisted: int):
@@ -67,8 +73,7 @@ def _get_order_by(user: User):
 
 
 def generate_picks(user: User):
-    user_watched_ids = UserWatched.objects.filter(user=user).values_list("films__pk", flat=True)
-    user_watchlist_ids = UserWatchlist.objects.filter(user=user).values_list("films__pk", flat=True)
+    user_watched_ids = set(UserWatched.objects.filter(user=user).values_list("films__pk", flat=True))
     # Fetch existing picks to avoid duplicates
     existing_picks = Pick.objects.filter(user=user, year=CURRENT_YEAR)
     picked_film_ids = set(existing_picks.values_list("film__pk", flat=True))
@@ -93,7 +98,7 @@ def generate_picks(user: User):
         # Randomize and then prioritize watchlisted films
         all_category_films = (
             all_category_films.exclude(pk__in=user_watched_ids)
-            .annotate(is_watchlisted=Count("pk", filter=Q(pk__in=user_watchlist_ids)))
+            .annotate(is_watchlisted=Exists(UserWatchlist.objects.filter(user=user, films=OuterRef("pk"))))
             .annotate(
                 decade_watched_percentage=Case(*(decade_weights.cases()), default=100, output_field=IntegerField())
             )
@@ -115,4 +120,4 @@ def generate_picks(user: User):
         if film:
             Pick.objects.create(user=user, year=CURRENT_YEAR, category=category, film=film)
             picked_film_ids.add(film.pk)
-            decade_weights.add_to_decade(10 * (film.year // 10))
+            decade_weights.add_to_decade(film.decade)

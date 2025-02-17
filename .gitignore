@@ -36,7 +36,6 @@ db.sqlite3
 /media/
 
 # Static files
-/static/
 /staticfiles/
 
 # Local development settings

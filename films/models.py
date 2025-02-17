@@ -31,6 +31,10 @@ class Film(models.Model):
     def __str__(self):
         return f"{self.title} ({self.year})"
 
+    @property
+    def decade(self):
+        return 10 * (self.year // 10)
+
 
 class FilmSession(models.Model):
     film = models.ForeignKey(Film, related_name="sessions", on_delete=models.CASCADE)

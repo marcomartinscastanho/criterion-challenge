@@ -6,6 +6,7 @@ from django.shortcuts import redirect, render
 from django.utils.timezone import now
 from django.views.decorators.http import require_http_methods
 
+from categories.models import Category
 from categories.utils import get_category_films
 from common.constants import CURRENT_YEAR
 from films.models import Film, FilmSession
@@ -63,6 +64,7 @@ def complete_picks(request: HttpRequest):
     return redirect("/")
 
 
+# FIXME: may no longer be in use
 @login_required
 @require_http_methods(["PATCH"])
 def update_pick(request: HttpRequest, pick_id: int):
@@ -79,3 +81,47 @@ def update_pick(request: HttpRequest, pick_id: int):
         return JsonResponse({"success": True})
     except (Pick.DoesNotExist, Film.DoesNotExist):
         return JsonResponse({"success": False, "error": "Pick or Film not found"}, status=404)
+
+
+@login_required
+@require_http_methods(["PATCH"])
+def set_category_pick(request: HttpRequest):
+    data = json.loads(request.body)
+    category_id = data.get("category_id")
+    film_id = data.get("film_id")
+    try:
+        category = Category.objects.get(pk=category_id)
+    except Category.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Category not found"}, status=404)
+    try:
+        pick = Pick.objects.get(category=category, user=request.user)
+        if film_id:
+            try:
+                film = Film.objects.get(pk=film_id)
+            except Film.DoesNotExist:
+                return JsonResponse({"success": False, "error": "Film not found"}, status=404)
+            pick.film = film
+        pick.save()
+        return JsonResponse({"success": True})
+    except Pick.DoesNotExist:
+        try:
+            film = Film.objects.get(pk=film_id)
+        except Film.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Film not found"}, status=404)
+        Pick.objects.create(category=category, user=request.user, year=CURRENT_YEAR, film=film)
+    return JsonResponse({"success": True})
+
+
+@login_required
+@require_http_methods(["PATCH"])
+def toggle_lock(request: HttpRequest):
+    data = json.loads(request.body)
+    category_id = data.get("category_id")
+    try:
+        category = Category.objects.get(pk=category_id)
+        pick = Pick.objects.get(category=category, user=request.user)
+    except (Category.DoesNotExist, Pick.DoesNotExist):
+        return JsonResponse({"success": False, "error": "Category/Pick not found"}, status=404)
+    pick.locked = not pick.locked
+    pick.save()
+    return JsonResponse({"success": True})

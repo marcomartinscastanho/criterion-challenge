@@ -1,36 +1,152 @@
 {% extends "base.html" %}
 {% block content %}
   <h5>Category {{ category.number }}</h5>
-  <h1>{{ category.title }}</h1>
-  {% if pick %}
-    <section class="mb-4">
-      <h2>Your Pick</h2>
-      <a class="btn btn-lg btn-primary  {% if pick.watchlisted %}text-warning{% endif %}"
-         href="{{ pick.url }}"
-         target="_blank"
-         rel="noopener noreferrer"
-         title="{% if pick.watchlisted %}Watchlisted{% endif %}">{{ pick.film }}
-        {% if pick.is_locked %}🔒{% endif %}
-      </a>
-    </section>
-    {% if not pick.is_locked %}
-      <section class="mb-4">
-        <h2>Other options with sessions</h2>
-        {% include "alternatives.html" %}
-      </section>
-    {% endif %}
-  {% endif %}
-  <h2>All Films</h2>
-  <section class="d-flex justify-content-center flex-wrap mb-4">
+  <h1>
+    {{ category.title }}
+    {% if category.locked %}🔒{% endif %}
+  </h1>
+  <!-- Filters -->
+  <div class="btn-group mb-3" role="group" aria-label="Film filters">
+    <input type="checkbox"
+           class="btn-check"
+           id="filter-not-watched"
+           autocomplete="off"
+           {% if filters.filter_not_watched %}checked{% endif %}
+           onchange="toggleFilters({'filter_not_watched': {{ filters.filter_not_watched|yesno:"false,true" }} })">
+    <label class="btn btn-primary" for="filter-not-watched">Not Watched</label>
+    <input type="checkbox"
+           class="btn-check"
+           id="filter-watchlisted"
+           autocomplete="off"
+           {% if filters.filter_watchlisted %}checked{% endif %}
+           onchange="toggleFilters({'filter_watchlisted': {{ filters.filter_watchlisted|yesno:"false,true" }} })">
+    <label class="btn btn-primary" for="filter-watchlisted">Watchlisted</label>
+    <input type="checkbox"
+           class="btn-check"
+           id="filter-with-sessions"
+           autocomplete="off"
+           {% if filters.filter_with_sessions %}checked{% endif %}
+           onchange="toggleFilters({'filter_with_sessions': {{ filters.filter_with_sessions|yesno:"false,true" }} })">
+    <label class="btn btn-primary" for="filter-with-sessions">With Sessions</label>
+  </div>
+  <section class="row row-cols-1 row-cols-md-4 g-2 mb-4">
     {% for film in category.films %}
-      <a class="btn btn-lg btn-primary me-1 mb-1 {% if film.watched %}opacity-50{% endif %} {% if film.watchlisted %}text-warning{% endif %}"
-         href="{{ film.url }}"
-         target="_blank"
-         rel="noopener noreferrer"
-         title="{% if film.watched %}Watched{% elif film.watchlisted %}Watchlisted{% endif %}">{{ film.title }} <small>({{ film.year }})</small></a>
+      <div class="col">
+        <div class="card {% if not film.watched %}text-white{% endif %} {% if film.is_pick %}bg-primary{% endif %}">
+          <div class="card-header">
+            <h4>
+              {{ film.title }} <small><small class="fw-lighter">({{ film.year }})</small></small>
+            </h4>
+            <div>{{ film.directors }}</div>
+          </div>
+          {% if film.sessions %}
+            <ul class="list-group list-group-flush">
+              {% for session in film.sessions %}<li class="list-group-item">{{ session.date }}, {{ session.venue }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+          <div class="card-body">
+            <a href="{{ film.url }}"
+               class="btn btn-dark"
+               target="_blank"
+               rel="noopener noreferrer">Letterboxd</a>
+            <button class="btn btn-danger"
+                    {% if film.watched or film.picked or category.locked %}disabled{% endif %}
+                    {% if film.watched %}title="Already watched!"{% endif %}
+                    {% if film.picked %}title="Already picked!"{% endif %}
+                    onclick="setPick({{ category.id }}, {{ film.id }})">Pick</button>
+            {% if film.is_pick %}
+              <input type="checkbox"
+                     class="btn-check"
+                     id="btncheck1"
+                     {% if category.locked %}checked{% endif %}
+                     autocomplete="off"
+                     onchange="toggleLock({{ category.id }})">
+              <label class="btn btn-secondary" for="btncheck1">
+                {% if category.locked %}
+                  Unlock
+                {% else %}
+                  Lock
+                {% endif %}
+              </label>
+            {% endif %}
+          </div>
+        </div>
+      </div>
     {% empty %}
       <p>No films in this category.</p>
     {% endfor %}
   </section>
-  <a href="{% url 'categories' %}" class="btn btn-secondary">Back</a>
+  <script>
+    function setPick(categoryId, filmId) {
+        fetch(`/picks/set_category_pick/`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}",
+        },
+        body: JSON.stringify({ category_id: categoryId, film_id: filmId }),
+        })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error("Failed to update pick");
+        })
+        .then((data) => {
+          window.location.reload();
+        })
+        .catch((error) => {
+            console.error(error);
+            alert("Failed to update pick.");
+        });
+    }
+
+    function toggleLock(categoryId) {
+      fetch(`/picks/toggle_lock/`, {
+      method: "PATCH",
+      headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}",
+      },
+      body: JSON.stringify({ category_id: categoryId }),
+      })
+      .then((response) => {
+          if (response.ok) {
+              return response.json();
+          }
+          throw new Error("Failed to update lock status");
+      })
+      .then((data) => {
+        window.location.reload();
+      })
+      .catch((error) => {
+          console.error(error);
+          alert("Failed to update lock status.");
+      });
+    }
+
+    function toggleFilters(filters) {
+      fetch(`/user/preferences/filters/update/`, {
+      method: "PATCH",
+      headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}",
+      },
+      body: JSON.stringify(filters),
+      })
+      .then((response) => {
+          if (response.ok) {
+              return response.json();
+          }
+          throw new Error("Failed to update lock status");
+      })
+      .then((data) => {
+        window.location.reload();
+      })
+      .catch((error) => {
+          console.error(error);
+          alert("Failed to update lock status.");
+      });
+    }
+  </script>
 {% endblock content %}
