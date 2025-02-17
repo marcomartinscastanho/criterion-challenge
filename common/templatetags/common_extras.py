@@ -21,6 +21,6 @@ def more_than_a_month_ago(value):
 @register.filter
 def percent(value, arg):
     try:
-        return 100 * float(value) / float(arg)
+        return 100 * float(value) / (float(value) + float(arg))
     except (ValueError, ZeroDivisionError):
         return 0
