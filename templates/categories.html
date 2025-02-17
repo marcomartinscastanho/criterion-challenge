@@ -48,19 +48,22 @@
             </li>
             {% if category.pick %}
               <li class="list-group-item">
-                <strong>Your pick:</strong> {{ category.pick.film }}
-                {% if category.pick.watched %}
-                  <span title="watched">✅</span>
-                {% elif category.pick.watchlisted %}
-                  <span title="watchlisted">☑️</span>
-                {% endif %}
-                {% if category.pick.session %}<span title="with session soon">🎦</span>{% endif %}
+                Your pick:
+                <div>
+                  <strong class="fs-4">{{ category.pick.film }}</strong>
+                  {% if category.pick.watched %}
+                    <span title="watched">✅</span>
+                  {% elif category.pick.watchlisted %}
+                    <span title="watchlisted">☑️</span>
+                  {% endif %}
+                  {% if category.pick.session %}<span title="with session soon">🎦</span>{% endif %}
+                </div>
               </li>
             {% endif %}
           </ul>
           <div class="card-body">
             <a href='{% url 'category_detail' category.id %}'
-               class="btn btn-primary">Check Category</a>
+               class="btn {% if category.pick.watched %}btn-dark{% else %}btn-primary{% endif %}">Check Category</a>
           </div>
         </div>
       </div>
