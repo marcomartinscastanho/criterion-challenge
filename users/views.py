@@ -1,17 +1,18 @@
 import csv
 import json
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
 from common.letterboxd import scrape_letterboxd_for_tmdb_id
 from films.models import Film
 from films.utils import enrich_film_details
-from users.forms import ProfileForm
+from users.forms import PickOrderCriteriaForm, ProfileForm, SessionTimesForm
 from users.models import UserPreference, UserWatched, UserWatchlist
-from users.utils import get_watched_chart_data
+from users.utils import get_days_of_week, get_watched_chart_data
 
 
 @login_required
@@ -25,6 +26,7 @@ def profile(request: HttpRequest):
                 request, "user/profile/profile.html", {"form": form, "success": "Profile updated successfully!"}
             )
         else:
+            # FIXME: I don't think this makes sense here
             return render(
                 request, "user/profile/profile.html", {"form": form, "error": "The uploaded file must be a CSV file."}
             )
@@ -80,37 +82,53 @@ def film_stats(request: HttpRequest):
 
 
 @login_required
-@require_http_methods(["PATCH"])
-def set_pick_order_criteria(request: HttpRequest):
-    user = request.user
-    data = json.loads(request.body)
-    criteria = data.get("criteria")
-    preferences, _ = UserPreference.objects.get_or_create(user=user)
-    preferences.pick_order_criteria = criteria
-    preferences.save()
-    return JsonResponse({"success": True})
+def preferences(request):
+    user_prefs, _ = UserPreference.objects.get_or_create(user=request.user)
+    pick_order_form = PickOrderCriteriaForm(instance=user_prefs)
+    session_times_form = SessionTimesForm(instance=user_prefs)
+    return render(
+        request,
+        "user/preferences/preferences.html",
+        {
+            "pick_order_form": pick_order_form,
+            "session_times_form": session_times_form,
+            "days_of_week": get_days_of_week(),
+        },
+    )
 
 
 @login_required
-@require_http_methods(["PATCH"])
-def update_time_preferences(request: HttpRequest):
-    user = request.user
-    try:
-        data = json.loads(request.body)
-        user_prefs, _ = UserPreference.objects.get_or_create(user=user)
-        user_prefs.session_times = data
+def update_pick_order_criteria(request):
+    user_prefs = request.user.preferences
+    if request.method == "POST":
+        form = PickOrderCriteriaForm(request.POST, instance=user_prefs)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Pick order criteria updated successfully.")
+    return redirect("preferences")
+
+
+@login_required
+def update_session_times(request):
+    user_prefs = request.user.preferences
+    # unchecked chatgpt code...
+    if request.method == "POST":
+        session_times_data = {}
+        for key, value in request.POST.items():
+            if key.startswith("session_times"):
+                parts = key.split("[")
+                day_num = parts[1][:-1]  # Extract day number
+                field = parts[2][:-1]  # Extract field (start/end)
+                if day_num not in session_times_data:
+                    session_times_data[day_num] = {}
+                session_times_data[day_num][field] = int(value)
+        user_prefs.session_times = session_times_data
         user_prefs.save()
-        return JsonResponse({"success": True, "message": "Preferences updated successfully!"})
-    except Exception as e:
-        return JsonResponse({"success": False, "message": str(e)}, status=400)
+        messages.success(request, "Session times updated successfully.")
+    return redirect("preferences")
 
 
-@login_required
-def preferences(request: HttpRequest):
-    days_of_week = {1: "Sunday", 2: "Monday", 3: "Tuesday", 4: "Wednesday", 5: "Thursday", 6: "Friday", 7: "Saturday"}
-    return render(request, "user/preferences/preferences.html", {"days_of_week": days_of_week})
-
-
+# FIXME: give this a better name
 @login_required
 @require_http_methods(["PATCH"])
 def update_filter_preferences(request: HttpRequest):

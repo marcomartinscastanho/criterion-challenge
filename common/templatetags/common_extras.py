@@ -24,3 +24,15 @@ def percent(value, arg):
         return 100 * float(value) / (float(value) + float(arg))
     except (ValueError, ZeroDivisionError):
         return 0
+
+
+@register.filter
+def get_start(week_day_preferences: dict, key: str):
+    day_preference: dict = week_day_preferences.get(key)
+    return day_preference.get("start")
+
+
+@register.filter
+def get_end(week_day_preferences: dict, key: str):
+    day_preference: dict = week_day_preferences.get(key)
+    return day_preference.get("end")

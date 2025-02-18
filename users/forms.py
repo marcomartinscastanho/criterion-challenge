@@ -1,6 +1,6 @@
 from django import forms
 
-from users.models import User
+from users.models import User, UserPreference
 
 
 class ProfileForm(forms.ModelForm):
@@ -15,3 +15,17 @@ class ProfileForm(forms.ModelForm):
         help_texts = {
             "date_of_birth": 'Having your date of birth is important because the pool of available films in some categories depends on your birth year. E.g. "Watch a film from the year you were born"'
         }
+
+
+class PickOrderCriteriaForm(forms.ModelForm):
+    class Meta:
+        model = UserPreference
+        fields = ["pick_order_criteria"]
+        widgets = {"pick_order_criteria": forms.HiddenInput()}
+
+
+class SessionTimesForm(forms.ModelForm):
+    class Meta:
+        model = UserPreference
+        fields = ["session_times"]
+        widgets = {"session_times": forms.HiddenInput()}
