@@ -37,7 +37,7 @@ class FilmManager(Manager):
 
 
 class FilmSessionQuerySet(QuerySet):
-    def filter_by_datetime_preference(self, user: AbstractBaseUser):
+    def filter_by_datetime_preference(self, user: AbstractBaseUser) -> QuerySet:
         """
         Filters FilmSession queryset based on user-defined time intervals for each day of the week.
         """
