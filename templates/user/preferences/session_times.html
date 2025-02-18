@@ -1,46 +1,82 @@
 {% load common_extras %}
 <section class="mb-5">
     <link rel="stylesheet"
-          href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+          href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.js"></script>
     <script>
-        $(document).ready( function() {
-            const userSessionTimePref = {{ user.preferences.session_times|safe }};    
-            $( ".hour-slider" ).each(function () {
-                let sliderId = $(this).attr("id").split("-")[1];
+        document.addEventListener("DOMContentLoaded", function () {
+            const userSessionTimePref = {{ user.preferences.session_times|safe }};  
+            document.querySelectorAll(".hour-slider").forEach(function (slider) {
+                let sliderId = slider.id.split("-")[1];
                 let start = userSessionTimePref[sliderId]?.start ?? 0;
                 let end = userSessionTimePref[sliderId]?.end ?? 24;
-                $("#" + $(this).attr("id")).slider({
-                    range: true,
-                    min: 0,
-                    max: 24,
-                    values: [start, end],
-                    create: function( event, ui ) {
-                        $( "#display-"+sliderId ).text( start+"h - "+end+"h" );
+                noUiSlider.create(slider, {
+                    start: [start, end],
+                    connect: true,
+                    range: {
+                        'min': 0,
+                        'max': 24
                     },
-                    slide: function( event, ui ) {
-                        let start = ui.values[0];
-                        let end = ui.values[1]
-                        $( "#input-"+sliderId+"-start" ).val( start );
-                        $( "#input-"+sliderId+"-end" ).val( end );
-                        $( "#display-"+sliderId ).text( start+"h - "+end+"h" );
-                        
-                    }
+                    step: 1,
                 });
+                slider.noUiSlider.on("update", function (values, handle) {
+                    let start = Math.round(values[0]);
+                    let end = Math.round(values[1]);
+                    document.getElementById(`input-${sliderId}-start`).value = start;
+                    document.getElementById(`input-${sliderId}-end`).value = end;
+                    document.getElementById(`display-${sliderId}`).textContent = `${start}h - ${end}h`;
+                });
+                document.getElementById(`display-${sliderId}`).textContent = `${start}h - ${end}h`;
             });
-            $(".startvalue").each(function () {
-                let valueId = $(this).attr("id").split("-")[1];
+            document.querySelectorAll(".startvalue").forEach(function (elem) {
+                let valueId = elem.id.split("-")[1];
                 let start = userSessionTimePref[valueId]?.start ?? 0;
-                $("#" + $(this).attr("id")).text(start);
+                elem.textContent = start;
             });
-            $(".endvalue").each(function () {
-                let valueId = $(this).attr("id").split("-")[1];
+            document.querySelectorAll(".endvalue").forEach(function (elem) {
+                let valueId = elem.id.split("-")[1];
                 let end = userSessionTimePref[valueId]?.end ?? 0;
-                $("#" + $(this).attr("id")).text(end);  
+                elem.textContent = end;
             });
-        });
+        });        
     </script>
+    <style>
+        .noUi-target {
+            height: 7px;
+            background: #073642;
+            box-shadow: none;
+            border: none;
+        }
+        .noUi-connect {
+            background: #b58900;
+        }
+        .noUi-horizontal .noUi-handle {
+            height: 18px;
+            width: 18px;
+            top: -6px;
+            right: -9px; /* half the width */
+        }
+        .noUi-handle {
+            box-shadow: none;
+            border: 1px solid #073642;
+            border-radius: 100%;
+            background: #b58900;
+            cursor: pointer;
+            transition: background 0.15s ease, box-shadow 0.2s ease;
+        }
+        .noUi-handle:focus{
+            box-shadow: 0 0 0 3px rgba(181, 136, 0, 0.5);
+        }
+        .noUi-handle:active{
+            background:rgb(166, 172, 178);
+        }
+        .noUi-handle::before {
+            content: none;
+        }
+        .noUi-handle::after {
+            content: none;
+        }
+    </style>
     <h3 class="mb-3">When do you go to the cinema?</h3>
     <p>
         We'll suggest films with sessions within your schedule.

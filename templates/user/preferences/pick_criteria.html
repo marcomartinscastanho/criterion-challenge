@@ -2,21 +2,19 @@
     <script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script>
     <style>
         .options-list-container {
-            min-height: 50px;
+            min-height: 70px;
             min-width: 300px;
             border-radius: .375rem;
-            padding: 5px;
-            background-color:rgb(166, 172, 178);
         }
         .dropzone {
             min-height: 54px;
-            border: 1px solid #dee2e6;
+            border: none;
             padding: 5px;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             min-width: 300px;
-            background-color: white;
+            background-color: #adb5bd;
             border-radius: .375rem;
             gap: 5px;
             transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
@@ -27,6 +25,13 @@
             display: inline-block;
             white-space: nowrap;
             user-select: none;
+            background: #b58900;
+            border: none;
+            color: white;
+        }
+        .draggable:hover{
+            color: white;
+            background: #9a7400;
         }
     </style>
     <h3 class="mb-3">How should we prioritize picks for you?</h3>
@@ -46,7 +51,7 @@
         <div id="dropzone" class="dropzone flex flex-row mb-2"></div>
         <input type="hidden" name="pick_order_criteria" id="pick_order_criteria">
         <!-- Draggable Elements -->
-        <div class="options-list-container mb-3">
+        <div class="options-list-container">
             <div id="optionsList" class="flex flex-row">
                 <span class="draggable btn btn-light" data-id="-is_watchlisted">In My Watchlist</span>
                 <span class="draggable btn btn-light" data-id="-has_cc_id">In Criterion Collection</span>
