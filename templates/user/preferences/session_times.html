@@ -41,10 +41,7 @@
                 let sliderId = $(this).attr("id").split("-")[1];
                 let start = parseInt($("#startvalue-" + sliderId).text());
                 let end = parseInt($("#endvalue-" + sliderId).text());
-
-                if (start !== 0 || end !== 24) {
-                    preferences[sliderId] = { start, end };
-                }
+                preferences[sliderId] = { start, end };
             });
             console.log("Saved Preferences:", preferences);
             fetch("/user/preferences/session-times/update/", {

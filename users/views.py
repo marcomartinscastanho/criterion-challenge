@@ -107,7 +107,7 @@ def update_time_preferences(request: HttpRequest):
 
 @login_required
 def preferences(request: HttpRequest):
-    days_of_week = {1: "Monday", 2: "Tuesday", 3: "Wednesday", 4: "Thursday", 5: "Friday", 6: "Saturday", 7: "Sunday"}
+    days_of_week = {1: "Sunday", 2: "Monday", 3: "Tuesday", 4: "Wednesday", 5: "Thursday", 6: "Friday", 7: "Saturday"}
     return render(request, "user/preferences/preferences.html", {"days_of_week": days_of_week})
 
 
