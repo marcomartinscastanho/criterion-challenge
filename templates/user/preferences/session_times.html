@@ -1,3 +1,4 @@
+{% load common_extras %}
 <section class="mb-5">
     <link rel="stylesheet"
           href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
@@ -6,54 +7,39 @@
     <script>
         $(document).ready( function() {
             const userSessionTimePref = {{ user.preferences.session_times|safe }};    
-          $( ".hour-slider" ).each(function () {
-            let sliderId = $(this).attr("id").split("-")[1];
-            let start = userSessionTimePref[sliderId]?.start ?? 0;
-            let end = userSessionTimePref[sliderId]?.end ?? 24;
-            $("#" + $(this).attr("id")).slider({
-            range: true,
-            min: 0,
-            max: 24,
-            values: [start, end],
-            slide: function( event, ui ) {
-              $( "#startvalue-"+sliderId ).text(  ui.values[ 0 ] );
-              $( "#endvalue-"+sliderId ).text(  ui.values[ 1 ] );
-            }
-          });
-        });
-
-        $(".startvalue").each(function () {
-            let valueId = $(this).attr("id").split("-")[1];
-            let start = userSessionTimePref[valueId]?.start ?? 0;
-            $("#" + $(this).attr("id")).text(start);
-          });
-
-          $(".endvalue").each(function () {
-            let valueId = $(this).attr("id").split("-")[1];
-            let end = userSessionTimePref[valueId]?.end ?? 0;
-            $("#" + $(this).attr("id")).text(end);  
-          });
-
-          $("#session-times-form").submit(function (e) {
-            e.preventDefault();
-            let preferences = {};
-            $(".hour-slider").each(function () {
+            $( ".hour-slider" ).each(function () {
                 let sliderId = $(this).attr("id").split("-")[1];
-                let start = parseInt($("#startvalue-" + sliderId).text());
-                let end = parseInt($("#endvalue-" + sliderId).text());
-                preferences[sliderId] = { start, end };
+                let start = userSessionTimePref[sliderId]?.start ?? 0;
+                let end = userSessionTimePref[sliderId]?.end ?? 24;
+                $("#" + $(this).attr("id")).slider({
+                    range: true,
+                    min: 0,
+                    max: 24,
+                    values: [start, end],
+                    create: function( event, ui ) {
+                        $( "#display-"+sliderId ).text( start+"h - "+end+"h" );
+                    },
+                    slide: function( event, ui ) {
+                        let start = ui.values[0];
+                        let end = ui.values[1]
+                        $( "#input-"+sliderId+"-start" ).val( start );
+                        $( "#input-"+sliderId+"-end" ).val( end );
+                        $( "#display-"+sliderId ).text( start+"h - "+end+"h" );
+                        
+                    }
+                });
             });
-            console.log("Saved Preferences:", preferences);
-            fetch("/user/preferences/session-times/update/", {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": "{{ csrf_token }}"
-                },
-                body: JSON.stringify( preferences )
-                })
+            $(".startvalue").each(function () {
+                let valueId = $(this).attr("id").split("-")[1];
+                let start = userSessionTimePref[valueId]?.start ?? 0;
+                $("#" + $(this).attr("id")).text(start);
+            });
+            $(".endvalue").each(function () {
+                let valueId = $(this).attr("id").split("-")[1];
+                let end = userSessionTimePref[valueId]?.end ?? 0;
+                $("#" + $(this).attr("id")).text(end);  
+            });
         });
-    });
     </script>
     <h3 class="mb-3">When do you go to the cinema?</h3>
     <p>
@@ -61,34 +47,33 @@
         <br>
         <small>Consider only the starting time of the session, not the end time.</small>
     </p>
-    <form id="session-times-form">
-        <table class="table mb-0 align-middle mb-2">
-            <thead class="rounded-top">
-                <tr>
-                    <th>Day</th>
-                    <th></th>
-                    <th class="w-50">Hours</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for day_int, day_str in days_of_week.items %}
-                    <tr>
-                        <td>{{ day_str }}</td>
-                        <td>
-                            <span class="d-inline text-nowrap">
-                                <span id="startvalue-{{ day_int }}" class="startvalue" readonly></span>
-                                h -
-                                <span id="endvalue-{{ day_int }}" class="endvalue" readonly></span>
-                                h
-                            </span>
-                        </td>
-                        <td>
-                            <div id="slider-{{ day_int }}"  class="hour-slider"></div>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <button type="submit" class="btn btn-primary">Save Preferences</button>
+    <form id="session-times-form"
+          method="post"
+          action="{% url 'update-session-times' %}">
+        {% csrf_token %}
+        <div>
+            {% for day_num, day_name in days_of_week.items %}
+                <div class="row align-items-center mb-3">
+                    <div class="col-2 text-end">
+                        <label for="{{ day_name }}-range" class="fw-bold">{{ day_name }}</label>
+                    </div>
+                    <div class="col-7">
+                        <div id="slider-{{ day_num }}" class="hour-slider"></div>
+                    </div>
+                    <div class="col-3">
+                        <span id="display-{{ day_num }}" class="fw-bold">0h - 24h</span>
+                        <input type="hidden"
+                               name="session_times[{{ day_num }}][start]"
+                               id="input-{{ day_num }}-start"
+                               value="{{ user.preferences.session_times|get_start:day_num|default:0 }}">
+                        <input type="hidden"
+                               name="session_times[{{ day_num }}][end]"
+                               id="input-{{ day_num }}-end"
+                               value="{{ user.preferences.session_times|get_end:day_num|default:24 }}">
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
     </form>
 </section>

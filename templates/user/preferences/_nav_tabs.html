@@ -1,0 +1,17 @@
+<ul class="nav nav-tabs mb-2">
+    {% url 'profile' as profile_url %}
+    {% url 'stats' as stats_url %}
+    {% url 'preferences' as preferences_url %}
+    <li class="nav-item">
+        <a class="nav-link {% if request.path == profile_url %}active{% endif %}"
+           href="{{ profile_url }}">Profile</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.path == stats_url %}active{% endif %}"
+           href="{{ stats_url }}">Stats</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.path == preferences_url %}active{% endif %}"
+           href="{{ preferences_url }}">Preferences</a>
+    </li>
+</ul>

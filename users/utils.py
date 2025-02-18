@@ -35,3 +35,15 @@ def get_watched_chart_data(user: User):
         bar_data_2.append(watchlisted)
         line_data.append(round(watched / total * 100, 1) if total > 0 else 0)  # Avoid division by zero
     return {"decades": decades, "bar_data_1": bar_data_1, "bar_data_2": bar_data_2, "line_data": line_data}
+
+
+def get_days_of_week():
+    return {
+        "1": "Sunday",
+        "2": "Monday",
+        "3": "Tuesday",
+        "4": "Wednesday",
+        "5": "Thursday",
+        "6": "Friday",
+        "7": "Saturday",
+    }
