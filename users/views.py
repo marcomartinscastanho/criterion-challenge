@@ -25,11 +25,6 @@ def profile(request: HttpRequest):
             return render(
                 request, "user/profile/profile.html", {"form": form, "success": "Profile updated successfully!"}
             )
-        else:
-            # FIXME: I don't think this makes sense here
-            return render(
-                request, "user/profile/profile.html", {"form": form, "error": "The uploaded file must be a CSV file."}
-            )
     form = ProfileForm(instance=user)
     # in case of a GET
     return render(request, "user/profile/profile.html", {"form": form})
