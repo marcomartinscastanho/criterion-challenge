@@ -165,12 +165,12 @@ JAZZMIN_SETTINGS = {
         "common.Venue": "fa-solid fa-building",
         "directors.Director": "fa-solid fa-clapperboard",
         "films.Film": "fa-solid fa-film",
-        "films.FilmSession": "fa-solid fa-bars-staggered",
+        "films.FilmSession": "fa-solid fa-ticket",
         "picks.Pick": "fa-solid fa-check",
         "users.User": "fa-solid fa-user",
         "users.UserPreference": "fa-solid fa-sliders",
-        "users.UserWatchlist": "fa-regular fa-square",
-        "users.UserWatched": "fa-solid fa-square-check",
+        "users.UserWatchlist": "fa-solid fa-clock",
+        "users.UserWatched": "fa-solid fa-eye",
     },
 }
 
