@@ -17,19 +17,17 @@
   <form method="post" class="mt-4">
     {% csrf_token %}
     <div class="row mb-3">
-      <div class="col">
-        <label for="id_first_name" class="col-sm-3 col-form-label">First Name</label>
-        <div class="col-sm-12">{{ form.first_name }}</div>
-      </div>
-      <div class="col">
-        <label for="id_last_name" class="col-sm-3 col-form-label">Last Name</label>
-        <div class="col-sm-12">{{ form.last_name }}</div>
+      <label for="id_username" class="col-sm-1 col-form-label">Username</label>
+      <div class="col-sm-3">
+        {{ form.username }}
+        <small id="usernameHelp" class="form-text text-muted">{{ form.username.help_text }}</small>
       </div>
     </div>
     <div class="row mb-3">
-      <label for="id_date_of_birth" class="col-sm-3 col-form-label">Date of Birth</label>
-      <div class="col-sm-9">
-        {{ form.date_of_birth }}<small id="dateHelp" class="form-text text-muted">{{ form.date_of_birth.help_text }}</small>
+      <label for="id_date_of_birth" class="col-sm-1 col-form-label">Date of Birth</label>
+      <div class="col-sm-3">
+        {{ form.date_of_birth }}
+        <small id="dateHelp" class="form-text text-muted">{{ form.date_of_birth.help_text }}</small>
       </div>
     </div>
     <div class="mt-4">

@@ -6,9 +6,10 @@ from users.models import User, UserPreference, UserWatched, UserWatchlist
 
 
 class UserAdmin(DefaultUserAdmin):
+    list_display = ["username", "is_staff"]
     fieldsets = (
         (None, {"fields": ("username", "password")}),
-        (_("Personal info"), {"fields": ("first_name", "last_name", "date_of_birth", "email")}),
+        (_("Personal info"), {"fields": ["date_of_birth"]}),
         (_("Permissions"), {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
