@@ -3,7 +3,7 @@
   <h5>Category {{ category.number }}</h5>
   <h1>
     {{ category.title }}
-    {% if category.locked %}🔒{% endif %}
+    {% if category.locked %}<i class="fa-solid fa-lock" title="locked"></i>{% endif %}
   </h1>
   <!-- Filters -->
   <div class="btn-group mb-3" role="group" aria-label="Film filters">

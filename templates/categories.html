@@ -32,37 +32,40 @@
         <div class="card text-white {% if category.pick.watched %}bg-primary{% endif %} {% if category.pick.locked %}border-primary{% endif %}">
           <h4 class="card-header">
             <small>{{ category.number }}.</small> {{ category.title }}
-            {% if category.pick.locked %}<span title="locked">🔒</span>{% endif %}
+            {% if category.pick.locked %}<span title="locked"><i class="fa-solid fa-lock" title="locked"></i></span>{% endif %}
           </h4>
           <ul class="list-group list-group-flush">
             <li class="list-group-item">
-              <div>
-                <strong>Films:</strong> {{ category.films_count }}
-              </div>
-              <div>
-                <strong>Watched:</strong> {{ category.watched_count|default:0 }}
-              </div>
-              <div>
-                <strong>Watchlisted:</strong> {{ category.watchlist_count|default:0 }}
+              <div class="d-flex justify-content-around">
+                <div class="center" title="films">
+                  <i class="fa-solid fa-film" style="color: #FF8001"></i> {{ category.films_count }}
+                </div>
+                <div class="center" title="watched">
+                  <i class="fa-solid fa-eye" style="color: #01E053;"></i> {{ category.watched_count|default:0 }}
+                </div>
+                <div class="center" title="watchlisted">
+                  <i class="fa-solid fa-clock" style="color: #40BCF4;"></i>  {{ category.watchlist_count|default:0 }}
+                </div>
               </div>
             </li>
             {% if category.pick %}
               <li class="list-group-item">
-                Your pick:
-                <div>
-                  <strong class="fs-4">{{ category.pick.film }}</strong>
-                  {% if category.pick.watched %}
-                    <span title="watched">✅</span>
-                  {% elif category.pick.watchlisted %}
-                    <span title="watchlisted">☑️</span>
-                  {% endif %}
-                  {% if category.pick.session %}<span title="with session soon">🎦</span>{% endif %}
-                </div>
+                <strong class="fs-4">{{ category.pick.film }}</strong>
+                {% if category.pick.watched %}
+                  <i class="fa-solid fa-eye" style="color: #01E053;" title="watched"></i>
+                {% elif category.pick.watchlisted %}
+                  <i class="fa-solid fa-clock" style="color: #40BCF4;" title="watchlisted"></i>
+                {% endif %}
+                {% if category.pick.session %}
+                  <i class="fa-solid fa-ticket"
+                     style="color: #FF8001"
+                     title="with session soon"></i>
+                {% endif %}
               </li>
             {% endif %}
           </ul>
           <div class="card-body">
-            <a href='{% url 'category_detail' category.id %}'
+            <a href="{% url 'category_detail' category.id %}"
                class="btn {% if category.pick.watched %}btn-dark{% else %}btn-primary{% endif %}">Check Category</a>
           </div>
         </div>
