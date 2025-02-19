@@ -9,6 +9,7 @@ cloudscraper==1.2.71
 colorama==0.4.6
 cssbeautifier==1.15.1
 Django==5.1.5
+django-bootstrap4==24.4
 django-jazzmin==3.0.1
 djlint==1.36.4
 EditorConfig==0.17.0
