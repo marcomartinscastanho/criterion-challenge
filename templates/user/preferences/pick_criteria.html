@@ -74,6 +74,7 @@
                     document.getElementById("dropzone").appendChild(element);
                 }
             });
+            document.getElementById("pick_order_criteria").value = selectedCriteria.join(",");
         });
         // dropzone
         Sortable.create(dropzone, {
