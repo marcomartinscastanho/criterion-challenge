@@ -34,6 +34,7 @@ def categories(request: HttpRequest):
                 .exists()
             )
             pick = {
+                "id": pick.pk,
                 "film": str(pick_film),
                 "locked": is_locked,
                 "watched": is_watched,
@@ -83,6 +84,7 @@ def category_detail(request: HttpRequest, category_id: int):
             "id": film.pk,
             "title": film.title,
             "year": film.year,
+            "runtime": film.runtime,
             "directors": ", ".join(map(str, film.directors.all())),
             "url": film.letterboxd,
             "watched": UserWatched.objects.filter(user=user, films=film).exists(),

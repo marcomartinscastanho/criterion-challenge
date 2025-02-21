@@ -65,6 +65,21 @@
             {% endif %}
           </ul>
           <div class="card-footer text-end">
+            {% if category.pick %}
+              <input type="checkbox"
+                     class="btn-check"
+                     id="btncheck{{ category.pick.id }}"
+                     {% if category.pick.locked %}checked{% endif %}
+                     autocomplete="off"
+                     onchange="toggleLock({{ category.pick.id }})">
+              <label class="btn btn-secondary" for="btncheck{{ category.pick.id }}">
+                {% if category.pick.locked %}
+                  Unlock
+                {% else %}
+                  Lock
+                {% endif %}
+              </label>
+            {% endif %}
             <a href="{% url 'category_detail' category.id %}"
                class="btn {% if category.pick.watched %}btn-dark{% else %}btn-primary{% endif %}">Films</a>
           </div>
@@ -73,4 +88,30 @@
     {% endfor %}
   </div>
   <a href="{% url 'complete_picks' %}" class="btn btn-primary mb-3">Randomize Picks</a>
+  <script>
+    function toggleLock(pickId) {
+      console.log("pickId", pickId)
+      fetch(`/picks/toggle-lock/`, {
+      method: "PATCH",
+      headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}",
+      },
+      body: JSON.stringify({ pick_id: pickId }),
+      })
+      .then((response) => {
+          if (response.ok) {
+              return response.json();
+          }
+          throw new Error("Failed to update lock status");
+      })
+      .then((data) => {
+        window.location.reload();
+      })
+      .catch((error) => {
+          console.error(error);
+          alert("Failed to update lock status.");
+      });
+    }
+  </script>
 {% endblock content %}

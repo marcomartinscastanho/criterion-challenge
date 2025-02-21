@@ -54,10 +54,9 @@ def set_category_pick(request: HttpRequest):
 @require_http_methods(["PATCH"])
 def toggle_lock(request: HttpRequest):
     data = json.loads(request.body)
-    category_id = data.get("category_id")
+    pick_id = data.get("pick_id")
     try:
-        category = Category.objects.get(pk=category_id)
-        pick = Pick.objects.get(category=category, user=request.user)
+        pick = Pick.objects.get(pk=pick_id, user=request.user)
     except (Category.DoesNotExist, Pick.DoesNotExist):
         return JsonResponse({"success": False, "error": "Category/Pick not found"}, status=404)
     pick.locked = not pick.locked
