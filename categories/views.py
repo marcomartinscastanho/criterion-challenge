@@ -34,6 +34,7 @@ def categories(request: HttpRequest):
                 .exists()
             )
             pick = {
+                "id": pick.pk,
                 "film": str(pick_film),
                 "locked": is_locked,
                 "watched": is_watched,
