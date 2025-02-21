@@ -32,19 +32,22 @@
   <section class="row row-cols-1 row-cols-md-4 g-2 mb-4">
     {% for film in category.films %}
       <div class="col">
-        <div class="card {% if not film.watched %}text-white{% endif %} {% if film.is_pick %}bg-primary{% endif %}">
-          <div class="card-header">
+        <div class="card h-100 {% if film.is_pick %}bg-primary text-white{% endif %}">
+          <div class="card-header {% if not film.watched %}text-white{% endif %} ">
             <h4>
               {{ film.title }} <small><small class="fw-lighter">({{ film.year }})</small></small>
             </h4>
             <div>{{ film.directors }}</div>
+          </div>
+          <div class="card-body">
+            <small>{{ film.runtime }} mins</small>
           </div>
           {% if film.sessions %}
             <ul class="list-group list-group-flush">
               {% for session in film.sessions %}<li class="list-group-item">{{ session.date }}, {{ session.venue }}</li>{% endfor %}
             </ul>
           {% endif %}
-          <div class="card-body">
+          <div class="card-footer">
             <a href="{{ film.url }}"
                class="btn btn-dark"
                target="_blank"

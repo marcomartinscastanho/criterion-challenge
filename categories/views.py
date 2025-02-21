@@ -83,6 +83,7 @@ def category_detail(request: HttpRequest, category_id: int):
             "id": film.pk,
             "title": film.title,
             "year": film.year,
+            "runtime": film.runtime,
             "directors": ", ".join(map(str, film.directors.all())),
             "url": film.letterboxd,
             "watched": UserWatched.objects.filter(user=user, films=film).exists(),
