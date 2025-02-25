@@ -14,7 +14,6 @@
   </ul>
   <div class="mb-4">
     <h1>Film stats</h1>
-    <p>Your stats allow us to make a better selection for your Criterion Challenge.</p>
     {% if user.watched and user.watchlist %}
       {% include "./decades_chart.html" %}
     {% endif %}
@@ -33,11 +32,7 @@
             <div class="alert alert-warning">You haven't updated your Watched list in a while.</div>
           {% endif %}
         {% else %}
-          <div class="alert alert-warning">
-            We don't have your Watched films yet.
-            <br />
-            Use the form below to upload them.
-          </div>
+          <div class="alert alert-warning">We don't have your Watched films yet.</div>
         {% endif %}
       </div>
       <div class="col">
@@ -49,11 +44,7 @@
             <div class="alert alert-warning">You haven't updated your Watchlist in a while.</div>
           {% endif %}
         {% else %}
-          <div class="alert alert-warning">
-            We don't have your Watchlist stats yet.
-            <br />
-            Use the form below to upload them.
-          </div>
+          <div class="alert alert-warning">We don't have your Watchlist stats yet.</div>
         {% endif %}
       </div>
     </div>
