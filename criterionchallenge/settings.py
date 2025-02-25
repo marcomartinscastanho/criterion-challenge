@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 
+import dj_database_url
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -90,15 +91,16 @@ WSGI_APPLICATION = "criterionchallenge.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+DATABASE_NAME = os.getenv("DATABASE_NAME", "db")
+DATABASE_USER = os.getenv("DATABASE_USERNAME", "user")
+DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD", "password")
+DATABASE_HOST = os.getenv("DATABASE_HOST", "127.0.0.1")
+DATABASE_PORT = os.getenv("DATABASE_PORT", 5432)
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DATABASE_NAME", "db"),
-        "USER": os.getenv("DATABASE_USERNAME", "user"),
-        "PASSWORD": os.getenv("DATABASE_PASSWORD", "password"),
-        "HOST": os.getenv("DATABASE_HOST", "127.0.0.1"),
-        "PORT": os.getenv("DATABASE_PORT", 5432),
-    }
+    "default": dj_database_url.config(
+        default=f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}",
+        conn_max_age=600,
+    )
 }
 
 
