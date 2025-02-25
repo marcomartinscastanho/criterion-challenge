@@ -86,7 +86,7 @@ def category_detail(request: HttpRequest, category_id: int):
             "year": film.year,
             "runtime": film.runtime,
             "directors": ", ".join(map(str, film.directors.all())),
-            "url": film.letterboxd,
+            "url": film.letterboxd_url,
             "watched": UserWatched.objects.filter(user=user, films=film).exists(),
             "watchlisted": UserWatchlist.objects.filter(user=user, films=film).exists(),
             "is_pick": Pick.objects.filter(user=user, category=category, film=film).exists(),

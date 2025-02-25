@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from categories.models import Category
-from common.letterboxd import scrape_letterboxd_for_tmdb_id
+from common.letterboxd import scrape_letterboxd_film_page
 from common.models import Venue
 from films.models import Film, FilmSession
 from films.utils import enrich_film_details
@@ -89,13 +89,17 @@ class Command(BaseCommand):
                         if not all([name, year, url]):
                             continue
                         try:
-                            film = Film.objects.get(letterboxd=url)
+                            film = Film.objects.get(letterboxd_url=url)
                         except Film.DoesNotExist:
-                            tmdb_id = scrape_letterboxd_for_tmdb_id(url)
+                            letterboxd_data = scrape_letterboxd_film_page(url)
+                            tmdb_id = letterboxd_data.get("tmdb_id")
                             if not tmdb_id:
                                 print(f"Skipping {name} ({year}) - tmdb_id not found in letterboxd page")
                                 continue
-                            film = Film.objects.create(title=name, year=year, letterboxd=url, tmdb_id=tmdb_id)
+                            letterboxd_id = letterboxd_data.get("letterboxd_id")
+                            film = Film.objects.create(
+                                title=name, year=year, letterboxd_url=url, tmdb_id=tmdb_id, letterboxd_id=letterboxd_id
+                            )
                             enrich_film_details(film)
                             self.created += 1
                         except Film.MultipleObjectsReturned:

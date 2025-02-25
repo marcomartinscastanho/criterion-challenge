@@ -1,4 +1,3 @@
-import csv
 import json
 
 from django.contrib import messages
@@ -7,12 +6,9 @@ from django.http import HttpRequest, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
-from common.letterboxd import scrape_letterboxd_for_tmdb_id
-from films.models import Film
-from films.utils import enrich_film_details
 from users.forms import PickOrderCriteriaForm, ProfileForm, SessionTimesForm
-from users.models import UserPreference, UserWatched, UserWatchlist
-from users.utils import get_days_of_week, get_watched_chart_data
+from users.models import UserPreference
+from users.utils import get_days_of_week, get_user_watched_films, get_user_watchlist_films, get_watched_chart_data
 
 
 @login_required
@@ -34,42 +30,14 @@ def profile(request: HttpRequest):
 def film_stats(request: HttpRequest):
     user = request.user
     if request.method == "POST":
-        csv_file = request.FILES["csv_file"]
-        if not csv_file.name.endswith(".csv"):
-            return render(request, "user/stats/stats.html", {"error": "The uploaded file must be a CSV file."})
-        try:
-            decoded_file = csv_file.read().decode("utf-8").splitlines()
-            reader = csv.DictReader(decoded_file)
-            film_ids = []
-            for row in reader:
-                title = row["Name"]
-                year = row["Year"]
-                uri = row["Letterboxd URI"]
-                if not all([title, year, uri]):
-                    continue
-                try:
-                    film = Film.objects.get(letterboxd=uri)
-                except Film.DoesNotExist:
-                    tmdb_id = scrape_letterboxd_for_tmdb_id(uri)
-                    if not tmdb_id:
-                        print(f"Skipping {title} ({year}) - tmdb_id not found in letterboxd page")
-                        continue
-                    film = Film.objects.create(title=title, year=year, letterboxd=uri, tmdb_id=tmdb_id)
-                    enrich_film_details(film)
-                film_ids.append(film.pk)
-            if "watched" in request.FILES.get("csv_file").name:
-                user_watched, _ = UserWatched.objects.get_or_create(user=user)
-                user_watched.films.set(film_ids)
-                user_watched.save()
-                return render(request, "user/stats/stats.html", {"success": "Watched films updated!"})
-            elif "watchlist" in request.FILES.get("csv_file").name:
-                user_watchlist, _ = UserWatchlist.objects.get_or_create(user=user)
-                user_watchlist.films.set(film_ids)
-                user_watchlist.save()
-                return render(request, "user/stats/stats.html", {"success": "Watchlisted films updated!"})
-            return render(request, "user/stats/stats.html", {"error": "Invalid file format."})
-        except Exception as e:
-            return render(request, "user/stats/stats.html", {"error": f"An error occurred: {e}"})
+        get_user_watched_films(user)
+        get_user_watchlist_films(user)
+        chart_data = get_watched_chart_data(user)
+        return render(
+            request,
+            "user/stats/stats.html",
+            {"success": "Watchlisted films updated!", "chart_data": json.dumps(chart_data)},
+        )
     else:
         # GET
         chart_data = get_watched_chart_data(user)

@@ -3,7 +3,7 @@ from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.utils.html import format_html
 
-from common.letterboxd import scrape_letterboxd_for_tmdb_id
+from common.letterboxd import scrape_letterboxd_film_page
 from common.models import Country
 from common.utils import get_object_sql_insert
 from directors.models import Director
@@ -37,16 +37,18 @@ def get_directors_sql_inserts(film: Film) -> list[str]:
 
 def get_film_data(film: Film):
     if not film.tmdb_id:
-        if not film.letterboxd:
+        if not film.letterboxd_url:
             # nothing we can do here
             return
-        tmdb_id = scrape_letterboxd_for_tmdb_id(film.letterboxd)
+        letterboxd_data = scrape_letterboxd_film_page(film.letterboxd_url)
+        tmdb_id = letterboxd_data.get("tmdb_id")
         if not tmdb_id:
             print(f"Cant't get more deatils of {film} because we couldn't find the TMDB id")
             # nothing else we can do here
             return
         film.tmdb_id = tmdb_id
-        Film.objects.filter(pk=film.pk).update(tmdb_id=tmdb_id)
+        letterboxd_id = letterboxd_data.get("letterboxd_id")
+        Film.objects.filter(pk=film.pk).update(tmdb_id=tmdb_id, letterboxd_id=letterboxd_id)
     # if we got here, there is tmdb_id
     if not all(
         [
@@ -74,15 +76,17 @@ class FilmAdmin(admin.ModelAdmin):
         "letterboxd_link",
     ]
     list_display_links = ["title"]
-    search_fields = ["title", "letterboxd", "tmdb_id"]
+    search_fields = ["title", "letterboxd_url", "tmdb_id"]
     filter_horizontal = ["directors"]
     actions = ["generate_sql_inserts", "get_tmdb_data"]
 
     # TODO: create a separation in the form for external data (letterboxd url, cc_id, cc spine, tmdb id)
 
-    @admin.display(description="Letterboxd", ordering="letterboxd")
+    @admin.display(description="Letterboxd", ordering="letterboxd_url")
     def letterboxd_link(self, obj: Film):
-        return format_html('<a href="{url}" target="_blank" rel="noopener noreferrer">{url}</a>', url=obj.letterboxd)
+        return format_html(
+            '<a href="{url}" target="_blank" rel="noopener noreferrer">{url}</a>', url=obj.letterboxd_url
+        )
 
     @admin.display(description="Director", ordering="directors__name")
     def get_directors(self, obj: Film):

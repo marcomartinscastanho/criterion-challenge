@@ -28,11 +28,15 @@ def percent(value, arg):
 
 @register.filter
 def get_start(week_day_preferences: dict, key: str):
+    if not week_day_preferences:
+        return None
     day_preference: dict = week_day_preferences.get(key)
     return day_preference.get("start")
 
 
 @register.filter
 def get_end(week_day_preferences: dict, key: str):
+    if not week_day_preferences:
+        return None
     day_preference: dict = week_day_preferences.get(key)
     return day_preference.get("end")
