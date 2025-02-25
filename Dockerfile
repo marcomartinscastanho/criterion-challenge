@@ -48,5 +48,4 @@ USER appuser
 # Expose the application port
 EXPOSE 6091 
 
-# Start the application using Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:6091", "--workers", "3", "criterionchallenge.wsgi:application"]
+CMD ["python", "-m", "gunicorn", "criterionchallenge.asgi:application", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:6091"]
