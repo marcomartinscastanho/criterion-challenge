@@ -35,7 +35,7 @@ def call_tmdb_api(path: str, query_params: dict = {}):
         url = f"{url}?{query_string}"
     response = requests.get(url, headers={"Authorization": f"Bearer {settings.TMDB_API_TOKEN}"})
     if response.status_code != 200:
-        raise APIError
+        raise APIError(f"Could not get TMDB {url}")
     return response.json()
 
 
