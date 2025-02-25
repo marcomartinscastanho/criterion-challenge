@@ -32,7 +32,12 @@ def film_stats(request: HttpRequest):
     if request.method == "POST":
         get_user_watched_films(user)
         get_user_watchlist_films(user)
-        return render(request, "user/stats/stats.html", {"success": "Watchlisted films updated!"})
+        chart_data = get_watched_chart_data(user)
+        return render(
+            request,
+            "user/stats/stats.html",
+            {"success": "Watchlisted films updated!", "chart_data": json.dumps(chart_data)},
+        )
     else:
         # GET
         chart_data = get_watched_chart_data(user)
