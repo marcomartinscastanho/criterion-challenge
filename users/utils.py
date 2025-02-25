@@ -1,7 +1,9 @@
 from django.db.models import Count, ExpressionWrapper, F, IntegerField
 
+from common.letterboxd import scrape_letterboxd_list_page
 from films.models import Film
-from users.models import User
+from users.constants import WATCHED_URL, WATCHLIST_URL
+from users.models import User, UserWatched, UserWatchlist
 
 
 def get_watched_chart_data(user: User):
@@ -47,3 +49,33 @@ def get_days_of_week():
         "6": "Friday",
         "7": "Saturday",
     }
+
+
+def get_user_watched_films(user: User):
+    film_ids = []
+    page = 1
+    while True:
+        url = WATCHED_URL.format(username=user.username, page=page)
+        films = scrape_letterboxd_list_page(url)
+        if films is None:
+            break
+        film_ids.extend(films)
+        page += 1
+    user_watched, _ = UserWatched.objects.get_or_create(user=user)
+    user_watched.films.set(film_ids)
+    user_watched.save()
+
+
+def get_user_watchlist_films(user: User):
+    film_ids = []
+    page = 1
+    while True:
+        url = WATCHLIST_URL.format(username=user.username, page=page)
+        films = scrape_letterboxd_list_page(url)
+        if films is None:
+            break
+        film_ids.extend(films)
+        page += 1
+    user_watchlist, _ = UserWatchlist.objects.get_or_create(user=user)
+    user_watchlist.films.set(film_ids)
+    user_watchlist.save()
