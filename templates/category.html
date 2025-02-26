@@ -32,8 +32,8 @@
   <section class="row row-cols-1 row-cols-md-4 g-2 mb-4">
     {% for film in category.films %}
       <div class="col">
-        <div class="card h-100 {% if film.is_pick %}bg-primary text-white{% endif %}">
-          <div class="card-header {% if not film.watched %}text-white{% endif %} ">
+        <div class="card h-100  border-2 {% if film.is_pick %}bg-primary text-white{% elif film.watched %}opacity-25 hover-opacity-75{% endif %}">
+          <div class="card-header text-white ">
             <h4>
               {{ film.title }} <small><small class="fw-lighter">({{ film.year }})</small></small>
             </h4>
@@ -53,10 +53,9 @@
                target="_blank"
                rel="noopener noreferrer">Letterboxd</a>
             <button class="btn btn-danger"
-                    {% if film.watched or film.picked or category.locked %}disabled{% endif %}
+                    {% if film.picked or category.locked %}disabled{% endif %}
                     {% if category.locked %}title="Category locked"{% endif %}
                     {% if film.watched %}title="Already watched"{% endif %}
-                    {% if film.picked %}title="Already picked"{% endif %}
                     onclick="setPick({{ category.id }}, {{ film.id }})">Pick</button>
           </div>
         </div>
@@ -114,4 +113,12 @@
       });
     }
   </script>
+  <style>
+    .hover-opacity-75 {
+      transition: opacity 0.2s ease;
+    }
+    .hover-opacity-75:hover {
+      opacity: 0.75 !important;
+    }
+  </style>
 {% endblock content %}

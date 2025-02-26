@@ -71,6 +71,7 @@ class FilmAdmin(admin.ModelAdmin):
         "get_countries",
         "get_genres",
         "runtime",
+        "letterboxd_id",
         "tmdb_id",
         "cc_id",
         "letterboxd_link",

@@ -9,30 +9,28 @@
             class="form-select"
             onchange="this.form.submit()">
       <option value="number"
-              {% if request.GET.sort == "number" %}selected{% endif %}>Category ↑</option>
+              {% if request.GET.sort == "number" %}selected{% endif %}>Category ↓</option>
       <option value="-number"
-              {% if request.GET.sort == "-number" %}selected{% endif %}>Category ↓</option>
+              {% if request.GET.sort == "-number" %}selected{% endif %}>Category ↑</option>
       <option value="films_count"
-              {% if request.GET.sort == "films_count" %}selected{% endif %}>Films ↑</option>
+              {% if request.GET.sort == "films_count" %}selected{% endif %}>Films ↓</option>
       <option value="-films_count"
-              {% if request.GET.sort == "-films_count" %}selected{% endif %}>Films ↓</option>
-      <option value="watched_count"
-              {% if request.GET.sort == "watched_count" %}selected{% endif %}>Watched ↑</option>
-      <option value="-watched_count"
-              {% if request.GET.sort == "-watched_count" %}selected{% endif %}>Watched ↓</option>
+              {% if request.GET.sort == "-films_count" %}selected{% endif %}>Films ↑</option>
       <option value="watchlist_count"
-              {% if request.GET.sort == "watchlist_count" %}selected{% endif %}>Watchlist ↑</option>
+              {% if request.GET.sort == "watchlist_count" %}selected{% endif %}>Watchlist ↓</option>
       <option value="-watchlist_count"
-              {% if request.GET.sort == "-watchlist_count" %}selected{% endif %}>Watchlist ↓</option>
+              {% if request.GET.sort == "-watchlist_count" %}selected{% endif %}>Watchlist ↑</option>
     </select>
   </form>
-  <div class="row row-cols-1 row-cols-md-4 g-3 mb-4">
+  <div class="row row-cols-1 row-cols-md-4 g-2 mb-4">
     {% for category in categories %}
       <div class="col">
-        <div class="card h-100 text-white {% if category.pick.watched %}bg-primary{% endif %} {% if category.pick.locked %}border-primary{% endif %}">
+        <div class="card h-100 text-white border-2 {% if category.pick.watched %}bg-dark opacity-25 hover-opacity-75{% elif category.pick.locked %}border-secondary{% endif %}">
           <h4 class="card-header">
             <small>{{ category.number }}.</small> {{ category.title }}
-            {% if category.pick.locked %}<span title="locked"><i class="fa-solid fa-lock" title="locked"></i></span>{% endif %}
+            {% if category.pick.locked %}
+              <span title="locked"><i class="fa-solid fa-lock" style="color: #B58900" title="locked"></i></span>
+            {% endif %}
           </h4>
           <ul class="card-body p-0 list-group list-group-flush">
             <li class="list-group-item">
@@ -114,4 +112,13 @@
       });
     }
   </script>
+  <style>
+    .hover-opacity-75 {
+      transition: opacity 0.2s ease, border 0.2s ease;
+    }
+    .hover-opacity-75:hover {
+      opacity: 0.75 !important;
+      border: 2px solid var(--bs-primary) !important;
+    }
+  </style>
 {% endblock content %}
